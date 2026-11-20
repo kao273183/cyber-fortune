@@ -812,7 +812,7 @@ ${lot.explanation?.summary || ''}
             ]),
           ]),
           h('div.oracle-slip-rank', [
-            rank.main && h(`div.cf-seal.oracle-seal${rank.good ? '' : '.is-ink'}${sealSize}`, { role: 'img', 'aria-label': `卦象 ${lot.guaRank}` }, h('span', rank.main)),
+            rank.main && h(`div.cf-seal.oracle-seal${rank.good ? '' : '.is-ink'}${sealSize}`, { role: 'img', 'aria-label': `卦象 ${lot.guaRank}` }, h('span', sealSize === '.is-four' ? [...rank.main].map((ch) => h('i', ch)) : rank.main)),
             h('p', [
               rank.note && h('b', rank.note),
               h('span', `${oracleL('所問', 'Asked')} · ${oracleTopicName(topicObj)}`),

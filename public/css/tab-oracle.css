@@ -553,12 +553,25 @@
   text-indent: 0;
 }
 
+/* Four characters sit in a fixed 2×2 grid, read like a seal: right column top to bottom,
+   then the left column (先難 / 後易). A grid, not vertical text wrapping, so wider fallback
+   fonts on Android cannot push the characters out of the stamp. */
 .oracle-seal.is-four > span {
-  writing-mode: vertical-rl;
-  inline-size: 2.1em;
+  display: grid;
+  grid-template-rows: repeat(2, 1em);
+  grid-auto-columns: 1em;
+  grid-auto-flow: column;
+  direction: rtl;
+  gap: 3px 4px;
+  place-items: center;
   font-size: 25px;
-  line-height: 1.12;
-  letter-spacing: 0.04em;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.oracle-seal.is-four > span > i {
+  direction: ltr;
+  font-style: normal;
 }
 
 /* 所問 row reuses the almanac ruled row */
