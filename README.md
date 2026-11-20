@@ -42,3 +42,17 @@ SQLite 的 wasm 已直接打包進 `js/local-api.js`，所以 `dist/index.html` 
 靜態版的差異：
 - 資料只存在當前瀏覽器（清除網站資料就會消失，換裝置不會同步）
 - 每日星座仍會從瀏覽器直接呼叫 FreeHoroscopeAPI 與 Google 翻譯；失敗時自動改用內建摘要
+
+## 安裝到桌面（PWA）
+
+網站可以像 App 一樣安裝，裝好後沒有網路也能開：
+
+- **Android / 電腦版 Chrome、Edge**：右上角會出現「安裝」按鈕，按下去用瀏覽器的安裝視窗。
+- **iPhone / iPad**：「安裝」按鈕會顯示教學：分享 → 加入主畫面 → 新增。
+- 已經安裝、或瀏覽器不支援安裝時，不會顯示按鈕。
+
+相關檔案：`public/manifest.webmanifest`（名稱、圖示、顏色）、`public/sw.js`（離線快取）、
+`public/js/install.js`（安裝按鈕與 iPhone 教學）。`npm run build:static` 會把要離線保存的檔案清單
+和版本號寫進 `dist/sw.js`，每次部署內容有變，訪客下次連網開啟時就會拿到新版。
+
+圖示由 `static/icon-seal.html` 用 Chrome 截圖產生（`?v=any|maskable|apple|favicon`），放在 `public/icons/`。

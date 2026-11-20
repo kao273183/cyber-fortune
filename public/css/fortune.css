@@ -958,6 +958,100 @@ html:lang(en) .cf-day-sheet .cf-row dt {
   padding: 0;
 }
 
+/* 「安裝到桌面」: only shown when the browser can install the site */
+.cf-install-btn {
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.cf-install-btn[hidden] {
+  display: none;
+}
+
+.cf-install-icon,
+.cf-install-share {
+  display: inline-flex;
+  color: var(--red);
+}
+
+.cf-install-share {
+  vertical-align: -3px;
+}
+
+.cf-install-lead {
+  margin: 0 0 var(--s3);
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.cf-install-steps {
+  display: grid;
+  gap: var(--s2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: cf-step;
+}
+
+.cf-install-steps li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: baseline;
+  counter-increment: cf-step;
+}
+
+.cf-install-steps li::before {
+  content: counter(cf-step);
+  color: var(--red);
+  font: 700 15px/1 var(--serif);
+}
+
+/* Narrow phones: the brand, 中/EN and theme toggle leave room only for the icon */
+@media (max-width: 374px) {
+  .cf-install-label {
+    display: none;
+  }
+
+  .cf-install-btn {
+    width: var(--tap, 44px);
+    padding: 0;
+  }
+
+  .cf-topbar:has(.cf-install-btn:not([hidden])) .cf-brand-name {
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* English: "Lucky Hour" is wider than 吉時行樂, so phones get the icon-only button */
+@media (max-width: 479px) {
+  html:lang(en) .cf-install-label {
+    display: none;
+  }
+
+  html:lang(en) .cf-install-btn {
+    width: var(--tap, 44px);
+    padding: 0;
+  }
+
+  html:lang(en) .cf-topbar:has(.cf-install-btn:not([hidden])) .cf-brand-name {
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* Smallest phones: 吉時行樂 steps down once more; in English the 吉 seal alone carries the brand */
+@media (max-width: 359px) {
+  .cf-topbar:has(.cf-install-btn:not([hidden])) .cf-brand-name {
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  html:lang(en) .cf-topbar:has(.cf-install-btn:not([hidden])) .cf-brand-name {
+    display: none;
+  }
+}
+
 @media (pointer: coarse) {
   .cf-icon-btn {
     width: var(--tap);

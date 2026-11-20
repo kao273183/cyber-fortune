@@ -302,7 +302,7 @@ Printed and plain; ink for the main action, never a gradient.
 - **Control strip:** birth-data fields sit in a band ruled top and bottom with strong vermilion rules.
 
 ### Navigation
-- **App bar:** brand seal (吉) plus serif name 吉時行樂 left; 中/EN toggle (active language bold ink, other gray) and a theme icon button right.
+- **App bar:** brand seal (吉) plus serif name 吉時行樂 left; an install button (download glyph + 「安裝」, only when the browser can install; icon-only under 375px and on English phones), the 中/EN toggle (active language bold ink, other gray) and a theme icon button right.
 - **Tab row:** gray sans labels at 0.12em; hover inks them; active is bold ink with a 2px vermilion underline that scales in from 0. Sub-mode switches (單人/雙人) are a segmented strip with a strong vermilion rule.
 
 ### Seal Stamp (signature)

@@ -4,9 +4,11 @@
 //   2. bundle static/local-api.js (server routes + libs + browser shims + embedded
 //      sql.js wasm) -> dist/js/local-api.js
 //   3. load local-api.js in dist/index.html before the app scripts
+//   4. fill the service worker's offline precache list and version (dist/sw.js)
 //
 // Usage: npm run build:static
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -69,5 +71,27 @@ if (!html.includes(marker)) {
 }
 fs.writeFileSync(indexPath, html.replace(marker, `<script src="js/local-api.js"></script>\n  ${marker}`));
 
+// 4. service worker: precache the app shell, versioned by its content so every deploy
+//    that changes it replaces the offline copy. Images are cached as they are viewed.
+const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+  const full = path.join(dir, entry.name);
+  return entry.isDirectory() ? walk(full) : [path.relative(distDir, full).split(path.sep).join('/')];
+});
+const shellFiles = walk(distDir)
+  .filter((file) => /^(index\.html|manifest\.webmanifest|css\/.+\.css|js\/.+\.js|icons\/.+\.png)$/.test(file))
+  .sort();
+const shellHash = crypto.createHash('sha256');
+for (const file of shellFiles) shellHash.update(file).update(fs.readFileSync(path.join(distDir, file)));
+const swVersion = shellHash.digest('hex').slice(0, 12);
+const swPath = path.join(distDir, 'sw.js');
+const swSource = fs.readFileSync(swPath, 'utf8');
+const swBuilt = swSource
+  .replace("const VERSION = 'dev';", `const VERSION = '${swVersion}';`)
+  .replace('const PRECACHE = [];', `const PRECACHE = ${JSON.stringify(['./', ...shellFiles])};`);
+if (swBuilt === swSource || !swBuilt.includes(swVersion)) {
+  throw new Error('build:static could not fill VERSION / PRECACHE in public/sw.js');
+}
+fs.writeFileSync(swPath, swBuilt);
+
 const bundleBytes = Object.values(result.metafile.outputs).find((o) => o.entryPoint)?.bytes ?? 0;
-console.log(`Static site built in dist/ (local-api.js ${(bundleBytes / 1024).toFixed(0)} KB)`);
+console.log(`Static site built in dist/ (local-api.js ${(bundleBytes / 1024).toFixed(0)} KB, offline shell ${shellFiles.length} files, sw ${swVersion})`);

@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&text=%E5%90%89&display=block">
+<style>
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: transparent; }
+  body { display: grid; place-items: center; }
+  .seal { position: relative; display: grid; place-items: center; background: #b8231f; color: #f8f1e2; font-family: 'Noto Serif TC', serif; font-weight: 900; line-height: 1; }
+  .seal::after { content: ''; position: absolute; border: var(--rim-w) solid rgba(248, 241, 226, 0.72); inset: var(--rim-inset); border-radius: var(--rim-r); }
+  .seal span { position: relative; transform: translateY(var(--nudge, 0)); }
+  /* any: the header stamp, tilted, on transparent */
+  .any .seal { width: 84vw; height: 84vw; border-radius: 10% 7% 13% 10%; transform: rotate(-3deg); font-size: 50vw; --rim-w: max(1.5px, 1.3vw); --rim-inset: 6.5vw; --rim-r: 5% 3% 8% 5%; --nudge: -1%; }
+  /* apple: full bleed, rim kept clear of the iOS corner mask */
+  .apple .seal { width: 100vw; height: 100vh; font-size: 52vw; --rim-w: max(1.5px, 1.2vw); --rim-inset: 9vw; --rim-r: 15vw; --nudge: -1%; }
+  /* maskable: full bleed, no rim, glyph inside the 80% safe circle */
+  .maskable .seal { width: 100vw; height: 100vh; font-size: 44vw; --nudge: -1%; }
+  .maskable .seal::after { display: none; }
+  /* favicon: the header mark, upright and filling the square */
+  .favicon .seal { width: 100vw; height: 100vh; border-radius: 12%; font-size: 64vw; --rim-w: 1px; --rim-inset: 2.5px; --rim-r: 8%; }
+</style></head>
+<body><div class="seal"><span>吉</span></div>
+<script>document.body.className = new URLSearchParams(location.search).get('v') || 'any';</script>
+</body></html>
