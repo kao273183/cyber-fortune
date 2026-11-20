@@ -598,21 +598,26 @@
 }
 
 /* Bamboo patch over the art's fixed carving, re-carved with the drawn lot's number.
-   Colours are sampled from the stick raster, so they stay the same in both themes. */
+   Geometry is in stick-raster pixels (896 × 1200, so 12px = 1cqh): the bamboo runs x 417–477
+   and the art's own carving rows 462–926. */
 .oracle-stick-carve {
   position: absolute;
-  top: 36.5cqh;
+  top: 37.5cqh;
   left: 50%;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 6.4cqh;
-  height: 39.5cqh;
-  padding-top: 0.5cqh;
+  /* vertical-rl turns the flex axes: main runs down the stick, cross runs across it */
+  justify-content: flex-start;
+  align-items: center;
+  width: 4.6cqh;
+  height: 40.8cqh;
+  padding-top: 1cqh;
   overflow: hidden;
   transform: translateX(-50%);
-  border-radius: 1px;
-  background: #c79c57;
+  /* Uncarved rows 738–758 of the same raster stretched down the patch. The grain is vertical,
+     so the bamboo's colour, shading and streaks carry straight through, in both themes. */
+  background: url("../img/oracle/oracle-stick.png") -35.03cqh -1505.5cqh / 74.667cqh 2448cqh no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 0.6cqh, #000 calc(100% - 0.6cqh), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 0.6cqh, #000 calc(100% - 0.6cqh), transparent);
   color: #4a2c0c;
   font: 700 3.1cqh/1.02 var(--serif);
   writing-mode: vertical-rl;
