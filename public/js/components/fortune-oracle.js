@@ -103,6 +103,7 @@ function createFortuneOracleView() {
   let revealNext = false; // after a lookup pick on a phone, bring the slip into view
   let currentLot = null; // 當前展示之籤詩
   let drawnLotInfo = null; // 抽得之籤詩包裝
+  let drawnRecord = null; // 這次抽籤自動記入「我的求籤紀錄」的那一筆
   let lookupNumber = 1; // 查籤當前選中號碼
   let lotsSummaryList = null; // 60 籤快速清單快取
   let loadingLots = false;
@@ -165,6 +166,29 @@ function createFortuneOracleView() {
 
   fetchLotsList();
   fetchRecordsList();
+
+  // 每次求籤都自動記入「我的求籤紀錄」（心得之後再補）
+  const recordDraw = async (lot, topic, question) => {
+    if (!App?.user) return null;
+    try {
+      const res = await api.post('/api/fortune/oracle/records', {
+        collectionId: 'mazu_60_jiazi',
+        lotNumber: lot.lotNumber,
+        topic,
+        question: question || '',
+        userNotes: '',
+        verifiedStatus: 'pending',
+      });
+      if (res?.ok && res.record) {
+        savedRecordLotIds.add(Number(lot.lotNumber));
+        await fetchRecordsList();
+        return res.record;
+      }
+    } catch (err) {
+      console.warn('自動記錄求籤失敗:', err);
+    }
+    return null;
+  };
 
   // 儲存求籤至個人收藏庫
   const executeSaveRecord = async (lot, topic, question, refreshFn) => {
@@ -406,7 +430,10 @@ function createFortuneOracleView() {
         drawnLotInfo = res;
         currentLot = res.lot;
         landNext = true;
-        toast(`【第 ${res.lot.lotNumber} 籤 · ${res.lot.ganZhi}】求籤成功！`, 'ok');
+        drawnRecord = await recordDraw(res.lot, selectedTopic, questionText.trim());
+        toast(drawnRecord
+          ? (t('fortune.oracle_recorded_toast', { num: res.lot.lotNumber, ganZhi: res.lot.ganZhi }) || `【第 ${res.lot.lotNumber} 籤 · ${res.lot.ganZhi}】已記入求籤紀錄`)
+          : `【第 ${res.lot.lotNumber} 籤 · ${res.lot.ganZhi}】求籤成功！`, 'ok');
       } else {
         toast(res?.error || '求籤異常，請重新嘗試', 'error');
       }
@@ -553,10 +580,12 @@ ${lot.explanation?.summary || ''}
       parent.appendChild(renderResult(currentLot, {
         topic: selectedTopic,
         question: questionText,
+        record: drawnRecord,
         refresh,
         onRedraw: () => {
           currentLot = null;
           drawnLotInfo = null;
+          drawnRecord = null;
           refresh();
         },
       }));
@@ -717,11 +746,27 @@ ${lot.explanation?.summary || ''}
   const renderResult = (lot, cfg = {}) => {
     const land = landNext;
     landNext = false;
-    const { topic = 'general', question = '', isLookup = false, onRedraw, refresh } = cfg;
+    const { topic = 'general', question = '', isLookup = false, onRedraw, refresh, record = null } = cfg;
     const isSaved = savedRecordLotIds.has(Number(lot.lotNumber));
+    const hasNote = Boolean(record?.userNotes);
+
+    // A drawn lot is already in 我的求籤紀錄, so its first action is the reflection note.
+    const noteButton = record && h('button.btn.btn-ghost.oracle-act', {
+      type: 'button',
+      title: oracleL('已記入我的求籤紀錄，可寫下心得', 'Already in My Records — add a note'),
+      onclick: () => executeUpdateRecordNote(record, () => {
+        if (drawnRecord?.id === record.id) drawnRecord = recordsList.find((r) => r.id === record.id) || drawnRecord;
+        refresh?.();
+      }),
+    }, [
+      oracleIcon(ORACLE_ICONS.edit),
+      h('span', hasNote
+        ? (t('fortune.oracle_note_edit_btn') || '編輯心得')
+        : (t('fortune.oracle_note_btn') || '寫下心得')),
+    ]);
 
     const actions = h('div.oracle-actions', { role: 'toolbar', 'aria-label': oracleL('籤詩操作', 'Lot actions') }, [
-      App?.user && (isSaved
+      noteButton || App?.user && (isSaved
         ? h('span.oracle-act.oracle-saved', { title: '已儲存至個人求籤紀錄庫' }, [
           oracleIcon(ORACLE_ICONS.bookmarkFilled),
           h('span', t('fortune.oracle_saved_badge') || '已收藏'),
