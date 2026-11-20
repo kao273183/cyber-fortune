@@ -1,0 +1,811 @@
+/* 西洋星盤 tab — 紅黑雙色農民曆 world.
+   Tokens and shared parts (.cf-sheet, .cf-vh, .cf-seal) live in base.css; the ruled rows
+   (.cf-ruled, .cf-rows, .cf-row), .cf-empty and .fortune-control-strip come from fortune.css.
+   The wheel is drawn with classes, not inline colours, so both themes reprint it. */
+
+/* Astrological glyphs print from one monoline symbol face, never as emoji. */
+
+.cf-astro {
+  --astro-glyph: "Noto Sans Symbols", "Apple Symbols", "Segoe UI Symbol", var(--serif);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s4);
+}
+
+.cf-astro > .cf-empty .btn {
+  margin-top: var(--s3);
+}
+
+.cf-astro-g {
+  font-family: var(--astro-glyph);
+  font-weight: 400;
+}
+
+.cf-astro-deg {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Birth data strip ---- */
+.cf-astro > .fortune-control-strip {
+  margin-bottom: 0;
+}
+
+.cf-astro-birth-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
+.cf-astro-birth-label {
+  color: var(--red);
+  font: 600 12px/1.4 var(--serif);
+  letter-spacing: 0.14em;
+}
+
+.cf-astro-birth-value {
+  font: 700 17px/1.35 var(--serif);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.cf-astro-birth-city {
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.cf-astro-birth-actions {
+  display: flex;
+  gap: var(--s2);
+}
+
+@media (max-width: 600px) {
+  .cf-astro-birth-actions {
+    width: 100%;
+  }
+
+  .cf-astro-birth-actions .btn {
+    flex: 1;
+  }
+}
+
+/* ---- 水星運行 notice: seal + printed note; warnings in ochre ---- */
+.cf-astro-retro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s4);
+  padding: 0 0 var(--s1) var(--s1);
+}
+
+.cf-astro-retro .cf-seal {
+  width: 52px;
+  height: 52px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-indent: 0.04em;
+  outline-offset: -4px;
+}
+
+.cf-astro-retro-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--red);
+  font: 700 16px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.cf-astro-retro.is-retro .cf-astro-retro-title,
+.cf-astro-retro.is-shadow .cf-astro-retro-title {
+  color: var(--ochre);
+}
+
+.cf-astro-retro-body {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font: 400 14px/1.6 var(--sans);
+}
+
+.cf-astro-retro-period {
+  margin-top: 4px;
+  color: var(--gray);
+  font: 500 12px/1.5 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- The chart sheet: wheel beside ruled tables, stacked on phones ---- */
+.cf-astro-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cf-astro-wheel {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: var(--s3) var(--s2) var(--s4);
+}
+
+.astro-wheel-svg {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.cf-astro-data {
+  min-width: 0;
+  border-top: 1px solid var(--red);
+}
+
+.cf-astro-data > section + section {
+  border-top: 1px solid var(--red);
+}
+
+@media (min-width: 960px) {
+  .cf-astro-sheet {
+    grid-template-columns: minmax(400px, 1fr) minmax(0, 1.05fr);
+  }
+
+  /* The wheel stays beside the table while it scrolls, so row hovers stay visible on it. */
+  .cf-astro-wheel {
+    position: sticky;
+    top: calc(var(--topbar-h) + 64px);
+    align-self: start;
+    padding: var(--s5) var(--s4);
+  }
+
+  .cf-astro-data {
+    border-top: 0;
+    border-left: 1px solid var(--red);
+  }
+}
+
+/* Wheel: paper, frame, scale */
+.cf-w-paper { fill: var(--paper-hi); }
+.cf-w-band { fill: none; stroke: var(--red-wash); }
+.cf-w-frame { fill: none; stroke: var(--red); stroke-width: 2; }
+.cf-w-frame-thin { fill: none; stroke: var(--red); stroke-width: 0.75; }
+.cf-w-rule-red { fill: none; stroke: var(--red); stroke-width: 1; }
+.cf-w-rule { fill: none; stroke: var(--rule); stroke-width: 0.8; }
+.cf-w-core { fill: var(--paper); stroke: var(--red); stroke-width: 1; }
+.cf-w-ticks { fill: none; stroke: var(--rule-strong); stroke-width: 0.7; }
+.cf-w-sign-div { stroke: var(--rule-strong); stroke-width: 0.8; }
+.cf-w-axis { stroke: var(--red); stroke-width: 1.6; }
+.cf-w-cusp { stroke: var(--hair-strong); stroke-width: 0.7; }
+.cf-w-pmark { stroke: var(--red); stroke-width: 1.2; }
+.cf-w-leader { stroke: var(--rule-strong); stroke-width: 0.7; stroke-dasharray: 1.2 1.8; }
+.cf-w-pdot { fill: var(--ink-2); }
+
+.cf-w-sign {
+  fill: var(--red);
+  font: 400 15px/1 var(--astro-glyph);
+}
+
+.cf-w-house-num {
+  fill: var(--gray);
+  font: 600 9.5px/1 var(--serif);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Aspect key, shared by the wheel, the legend and the slip */
+.cf-asp-line {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.cf-asp-harm { stroke: var(--red); }
+.cf-asp-chal { stroke: var(--ink); stroke-dasharray: 4 3; stroke-linecap: butt; }
+.cf-asp-neut { stroke: var(--gray); stroke-width: 1.7; stroke-dasharray: 0.1 3.2; }
+.cf-asp-axis { stroke: var(--red); stroke-width: 2.4; stroke-linecap: butt; }
+
+.astro-aspect-line {
+  opacity: 0.85;
+  transition:
+    opacity var(--t-base) var(--ease-out),
+    stroke-width var(--t-base) var(--ease-out);
+}
+
+.astro-aspect-line.is-highlighted {
+  opacity: 1;
+  stroke-width: 2.1;
+}
+
+.astro-aspect-line.is-dimmed {
+  opacity: 0.1;
+}
+
+/* Planet badges */
+.astro-planet-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.cf-pn-hit {
+  fill: transparent;
+}
+
+.cf-pn-focus {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: 0;
+}
+
+.astro-planet-node:focus-visible .cf-pn-focus {
+  opacity: 1;
+}
+
+.cf-pn-ring {
+  fill: var(--paper-hi);
+  stroke: var(--red);
+  stroke-width: 1.2;
+  transition:
+    fill var(--t-fast) var(--ease-out),
+    stroke-width var(--t-fast) var(--ease-out);
+}
+
+.cf-pn-glyph {
+  fill: var(--ink);
+  font: 600 12.5px/1 var(--astro-glyph);
+  pointer-events: none;
+  transition: fill var(--t-fast) var(--ease-out);
+}
+
+.cf-pn-retro {
+  fill: var(--ochre);
+  font: 700 8.5px/1 var(--serif);
+  pointer-events: none;
+}
+
+.astro-planet-node:hover .cf-pn-ring {
+  stroke-width: 2.2;
+}
+
+.astro-planet-node.is-active .cf-pn-ring {
+  fill: var(--red);
+}
+
+.astro-planet-node.is-active .cf-pn-glyph {
+  fill: var(--on-red);
+}
+
+/* Legend */
+.cf-astro-legend {
+  margin-top: var(--s3);
+}
+
+.cf-astro-legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font: 500 12px/1.4 var(--sans);
+}
+
+.cf-astro-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cf-astro-legend .cf-astro-g {
+  color: var(--gray);
+}
+
+.astro-aspect-swatch {
+  display: inline-flex;
+  flex: none;
+}
+
+.astro-aspect-swatch svg {
+  display: block;
+}
+
+/* ---- Ruled data: 軸點, 行星落點, 天賦亮點 ---- */
+.cf-astro-angle {
+  grid-template-columns: 64px minmax(0, 1fr);
+}
+
+.cf-astro-angle dt {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cf-astro-angle dt small {
+  font: 600 10px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-indent: 0;
+}
+
+.cf-astro-angle dd b {
+  font: 600 16px/24px var(--serif);
+}
+
+.cf-astro-planets,
+.cf-astro-gifts {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+
+.cf-astro-planets-body {
+  min-width: 0;
+}
+
+.cf-astro-hint {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.astro-planets-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.astro-planets-table th {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule-strong);
+  color: var(--red);
+  font: 600 12px/1.3 var(--serif);
+  letter-spacing: 0.12em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.astro-planets-table td {
+  padding: 7px 10px;
+  border-top: 1px solid var(--rule);
+  vertical-align: middle;
+}
+
+.astro-planets-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.astro-planets-table tbody tr {
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.astro-planets-table tbody tr:hover {
+  background: var(--red-wash);
+}
+
+.astro-planets-table tbody tr.is-active {
+  background: var(--red-wash-2);
+}
+
+.cf-astro-pbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 600 15px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cf-astro-pglyph {
+  width: 1.2em;
+  color: var(--red);
+  font-size: 17px;
+  line-height: 1;
+  text-align: center;
+}
+
+tr.is-active .cf-astro-pname {
+  color: var(--red);
+}
+
+.astro-retrograde-badge {
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--ochre) 55%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--ochre);
+  font: 600 11px/1.6 var(--sans);
+  letter-spacing: 0.02em;
+}
+
+.cf-astro-sign,
+.cf-astro-house {
+  font: 500 14px/1.4 var(--serif);
+  white-space: nowrap;
+}
+
+td.cf-astro-deg {
+  font: 500 14px/1.4 var(--serif);
+}
+
+.cf-astro-role {
+  color: var(--gray);
+  font: 400 13px/1.5 var(--sans);
+}
+
+.cf-astro-gifts ul {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cf-astro-gifts li {
+  padding: 10px 12px;
+}
+
+.cf-astro-gifts li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.cf-astro-gifts li b {
+  display: block;
+  font: 600 15px/22px var(--serif);
+}
+
+.cf-astro-gifts li span {
+  display: block;
+  margin-top: 2px;
+  color: var(--gray);
+  font: 400 13px/1.6 var(--sans);
+}
+
+/* Phones: each planet reflows into two printed lines */
+@media (max-width: 640px) {
+  .astro-planets-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .astro-planets-table,
+  .astro-planets-table tbody {
+    display: block;
+  }
+
+  .astro-planets-table tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "planet sign deg"
+      "house role role";
+    align-items: baseline;
+    gap: 2px 12px;
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .astro-planets-table tbody tr:first-child {
+    border-top: 0;
+  }
+
+  .astro-planets-table td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .cf-astro-pcell { grid-area: planet; }
+  .cf-astro-sign { grid-area: sign; }
+  td.cf-astro-deg { grid-area: deg; text-align: right; }
+  .cf-astro-house { grid-area: house; color: var(--ink-2); font-size: 13px; }
+  .cf-astro-role { grid-area: role; }
+
+  .cf-astro-pbtn {
+    min-height: 36px;
+  }
+}
+
+/* ---- The planet slip: a framed paper note; a bottom sheet on phones ---- */
+@keyframes cf-astro-slip {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes cf-astro-sheet-up {
+  from { transform: translateY(100%); }
+}
+
+.astro-planet-popover {
+  position: absolute;
+  z-index: 60;
+  width: 320px;
+  max-width: calc(100% - 20px);
+  max-height: min(540px, calc(100% - 20px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--paper-hi);
+  border: 2px solid var(--red);
+  outline: 1px solid var(--red);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-pop);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.55;
+  animation: cf-astro-slip var(--t-slow) var(--ease-sheet) backwards;
+}
+
+.astro-planet-popover.is-swap {
+  animation: cf-fade var(--t-fast) var(--ease-out) backwards;
+}
+
+.astro-popover-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px 8px 14px;
+  border-bottom: 1px solid var(--red);
+  background: var(--paper-hi);
+}
+
+.astro-popover-symbol {
+  color: var(--red);
+  font: 600 26px/1 var(--astro-glyph);
+}
+
+.astro-popover-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.astro-popover-name strong {
+  font: 700 18px/1.25 var(--serif);
+  letter-spacing: 0.08em;
+}
+
+.astro-popover-en {
+  color: var(--gray);
+  font: 500 12px/1.3 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.astro-popover-close-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--gray);
+  cursor: pointer;
+  transition:
+    color var(--t-fast) var(--ease-out),
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out);
+}
+
+.astro-popover-close-btn:hover {
+  border-color: var(--hair);
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.astro-popover-loc {
+  margin: 0;
+}
+
+.astro-popover-loc > div {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  min-height: 36px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.astro-popover-loc dt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--rule);
+  color: var(--red);
+  font: 600 12px/1.2 var(--serif);
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+}
+
+.astro-popover-loc dd {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 6px 12px;
+  font: 600 14px/1.4 var(--serif);
+}
+
+.astro-popover-loc .is-retro dd {
+  color: var(--ochre);
+}
+
+.astro-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.astro-popover-retro-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--ochre) 55%, transparent);
+  border-radius: var(--radius);
+  color: var(--ochre);
+  font: 500 12.5px/1.5 var(--sans);
+}
+
+.astro-popover-retro-alert .btn-icon {
+  margin-top: 2px;
+}
+
+.astro-planet-popover > .astro-popover-retro-alert {
+  margin: 0 14px 14px;
+}
+
+.astro-popover-keywords {
+  color: var(--red);
+  font: 600 14px/1.5 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.astro-popover-desc,
+.astro-popover-note {
+  color: var(--ink-2);
+  font: 400 13px/1.65 var(--sans);
+}
+
+.astro-popover-note strong {
+  color: var(--ink);
+  font: 700 13px/1.65 var(--serif);
+}
+
+.astro-popover-aspects {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--red);
+}
+
+.astro-popover-aspects-header {
+  margin-bottom: 2px;
+  color: var(--red);
+  font: 700 13px/1.4 var(--serif);
+  letter-spacing: 0.12em;
+}
+
+.astro-popover-aspects-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.astro-aspect-item {
+  padding: 6px 0;
+}
+
+.astro-aspect-item + .astro-aspect-item {
+  border-top: 1px solid var(--rule);
+}
+
+.astro-aspect-item-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 13px/1.4 var(--serif);
+}
+
+.astro-aspect-symbol {
+  width: 1em;
+  color: var(--ink-2);
+  font-family: var(--astro-glyph);
+  text-align: center;
+}
+
+.astro-aspect-orb {
+  margin-left: auto;
+  color: var(--gray);
+  font: 500 11px/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+
+.astro-aspect-desc {
+  margin-top: 2px;
+  padding-left: 30px;
+  color: var(--gray);
+  font: 400 12px/1.5 var(--sans);
+}
+
+.astro-popover-empty {
+  padding: 4px 0;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+@media (pointer: coarse) {
+  .astro-popover-close-btn {
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .cf-astro-pbtn {
+    min-height: var(--tap);
+  }
+}
+
+/* Phones: the slip rises from the bottom edge as a sheet */
+.astro-planet-popover.is-sheet {
+  position: fixed;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9990;
+  width: auto;
+  max-width: none;
+  max-height: min(74dvh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-width: 2px 0 0;
+  outline: 0;
+  animation: cf-astro-sheet-up var(--t-slow) var(--ease-out) backwards;
+}
+
+.astro-planet-popover.is-sheet.is-swap {
+  animation: cf-fade var(--t-fast) var(--ease-out) backwards;
+}
+
+/* ---- Authored moment: planets settle onto a new chart, then the aspects ink in ---- */
+@keyframes cf-planet-settle {
+  from { opacity: 0; transform: translate(var(--sx, 0px), var(--sy, 0px)); }
+}
+
+@keyframes cf-aspect-ink {
+  from { opacity: 0; }
+}
+
+.cf-astro-wheel.is-settling .astro-planet-node {
+  animation: cf-planet-settle 520ms var(--ease-sheet) calc(120ms + var(--i, 0) * 32ms) backwards;
+}
+
+.cf-astro-wheel.is-settling .astro-aspect-line {
+  animation: cf-aspect-ink 380ms var(--ease-out) 540ms backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-astro-wheel.is-settling .astro-planet-node {
+    animation-name: cf-fade;
+    animation-delay: 0ms;
+  }
+
+  .cf-astro-wheel.is-settling .astro-aspect-line {
+    animation-delay: 0ms;
+  }
+
+  .astro-planet-popover,
+  .astro-planet-popover.is-sheet {
+    animation-name: cf-fade;
+  }
+}

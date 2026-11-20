@@ -1,0 +1,1284 @@
+/* 紫微斗數 tab (single chart) — 紅黑雙色農民曆 world.
+   Tokens and shared parts (.cf-sheet, .cf-vh, .btn, .badge, keyframes) live in base.css;
+   the birth-data strip (.fortune-control-strip) lives in fortune.css.
+   The chart is a ruled almanac table inside a double vermilion frame: palace names and
+   吉 marks print red, stars and 凶 marks print ink, notes print warm gray. */
+
+/* ---------- Mode switch: 單人命盤 / 雙人合盤 ---------- */
+.ziwei-mode-switch.cf-modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 0 var(--s4);
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--paper-hi);
+  overflow: hidden;
+}
+
+.cf-mode {
+  min-height: 40px;
+  padding: 0 var(--s4);
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: 500 14px/1.2 var(--sans);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out);
+}
+
+.cf-mode + .cf-mode {
+  border-left: 1px solid var(--rule-strong);
+}
+
+.cf-mode:hover {
+  background: var(--red-wash);
+  color: var(--red);
+}
+
+.cf-mode:focus-visible {
+  outline-offset: -4px;
+}
+
+.cf-mode.is-active {
+  background: var(--red);
+  color: var(--on-red);
+  font-weight: 700;
+}
+
+.cf-mode.is-active:focus-visible {
+  outline-color: var(--on-red);
+}
+
+/* ---------- Demo chart notice (ochre = warning) ---------- */
+.ziwei-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  margin: 0 0 var(--s4);
+  padding: var(--s3) var(--s4);
+  border: 1px solid color-mix(in srgb, var(--ochre) 50%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--ochre) 7%, var(--paper-hi));
+  color: var(--ink);
+}
+
+.ziwei-demo-banner .btn-icon {
+  margin-top: 4px;
+  color: var(--ochre);
+}
+
+.ziwei-demo-text {
+  font: 400 13px/1.6 var(--sans);
+}
+
+.ziwei-demo-text strong {
+  margin-right: 6px;
+  color: var(--ochre);
+  font-family: var(--serif);
+}
+
+/* ---------- Page layout: chart sheet, detail sheet, then the year ---------- */
+.ziwei-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: start;
+}
+
+/* ---------- Chart sheet ---------- */
+.ziwei-chart {
+  min-width: 0;
+}
+
+.ziwei-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding: var(--s3) var(--s3) var(--s3) var(--s4);
+  border-bottom: 1px solid var(--red);
+}
+
+.ziwei-chart-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--s3);
+  min-width: 0;
+}
+
+.ziwei-chart-title {
+  color: var(--red);
+  font: 700 20px/1.3 var(--serif);
+  letter-spacing: 0.14em;
+}
+
+.ziwei-chart-hint {
+  color: var(--gray);
+  font: 400 12px/1.5 var(--sans);
+}
+
+.ziwei-chart-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.ziwei-year-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--ink-2);
+  font: 500 13px/1.2 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-rays-toggle {
+  letter-spacing: 0.08em;
+}
+
+.ziwei-rays-toggle.active {
+  color: var(--red-deep);
+}
+
+/* ---------- The 4x4 palace table with a hollow centre ---------- */
+.ziwei-board-wrap {
+  position: relative;
+}
+
+/* 1px gaps over a vermilion ground print as hairline rules between the palaces */
+.ziwei-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(96px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+}
+
+.ziwei-palace-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper-hi);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.ziwei-palace-cell.is-blank {
+  cursor: default;
+}
+
+.ziwei-palace-cell:hover {
+  background: color-mix(in srgb, var(--red) 5%, var(--paper-hi));
+}
+
+.ziwei-palace-cell:active {
+  background: color-mix(in srgb, var(--red) 11%, var(--paper-hi));
+}
+
+.ziwei-palace-cell:focus-visible {
+  position: relative;
+  z-index: 2;
+  outline: 2px solid var(--red);
+  outline-offset: -3px;
+}
+
+.ziwei-palace-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 5px 6px 4px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ziwei-palace-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  min-width: 0;
+}
+
+.ziwei-palace-name b {
+  color: var(--red);
+  font: 700 13px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-branch-tag {
+  flex: none;
+  color: var(--gray);
+  font: 500 11px/1.5 var(--serif);
+}
+
+.ziwei-shen-badge,
+.ziwei-yearly-badge {
+  display: inline-block;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font: 700 11px/1.2 var(--sans);
+  white-space: nowrap;
+}
+
+.ziwei-shen-badge {
+  border: 1px solid currentColor;
+  color: var(--ink);
+}
+
+.ziwei-yearly-badge {
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.ziwei-stars-area {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 6px;
+}
+
+.ziwei-main-star-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+}
+
+.ziwei-star-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.ziwei-star-item b {
+  font: 700 14px/1.35 var(--serif);
+}
+
+.ziwei-star-bright {
+  color: var(--gray);
+  font: 500 11px/1 var(--serif);
+}
+
+.ziwei-star-bright.is-strong {
+  color: var(--red);
+}
+
+.ziwei-star-bright.is-weak {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ziwei-star-empty {
+  color: var(--gray);
+  font: 500 12px/1.4 var(--serif);
+  letter-spacing: 0.1em;
+}
+
+/* 四化: 祿權科 print as red stamps, 忌 as an ink stamp */
+.ziwei-sihua-tag {
+  display: inline-block;
+  padding: 2px 3px;
+  border-radius: 2px;
+  font: 700 11px/1 var(--serif);
+  white-space: nowrap;
+}
+
+.ziwei-sihua-tag.lu,
+.ziwei-sihua-tag.quan,
+.ziwei-sihua-tag.ke {
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.ziwei-sihua-tag.ji {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Narrow cells print the single 四化 character; 化 stays for screen readers */
+.ziwei-sihua-hua {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.ziwei-minor-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  margin-top: 2px;
+}
+
+.ziwei-minor-chip {
+  font: 500 11px/1.5 var(--serif);
+  white-space: nowrap;
+}
+
+.ziwei-minor-chip.auspicious {
+  color: var(--red);
+}
+
+.ziwei-minor-chip.inauspicious {
+  color: var(--ink-2);
+}
+
+.ziwei-minor-chip i {
+  margin-left: 1px;
+  padding: 0 2px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-style: normal;
+}
+
+.ziwei-palace-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 6px;
+  padding: 3px 6px 5px;
+  border-top: 1px solid var(--rule);
+  color: var(--gray);
+  font: 400 11px/1.4 var(--sans);
+}
+
+.ziwei-daxian-badge {
+  color: var(--ink-2);
+  font: 600 11px/1.4 var(--serif);
+}
+
+.ziwei-role,
+.ziwei-opp {
+  display: none;
+}
+
+/* On washed palaces, notes print a shade darker to keep 4.5:1 */
+.ziwei-palace-cell.highlight-selected,
+.ziwei-palace-cell.highlight-sanfang {
+  --gray: var(--ink-2);
+}
+
+.highlight-selected :is(.ziwei-star-bright.is-strong, .ziwei-minor-chip.auspicious),
+.highlight-sanfang :is(.ziwei-star-bright.is-strong, .ziwei-minor-chip.auspicious, .ziwei-palace-name b) {
+  color: var(--red-deep);
+}
+
+/* Selected palace: an inverted vermilion header over a red wash */
+.ziwei-palace-cell.highlight-selected,
+.ziwei-palace-cell.highlight-selected:hover {
+  background: color-mix(in srgb, var(--red) 9%, var(--paper-hi));
+}
+
+.highlight-selected .ziwei-palace-head {
+  border-bottom-color: var(--red);
+  background: var(--red);
+}
+
+.highlight-selected .ziwei-palace-name b,
+.highlight-selected .ziwei-branch-tag,
+.highlight-selected .ziwei-shen-badge {
+  color: var(--on-red);
+}
+
+.highlight-selected .ziwei-yearly-badge {
+  background: var(--on-red);
+  color: var(--red);
+}
+
+/* 三方四正 palaces: a washed header band */
+.highlight-sanfang .ziwei-palace-head {
+  border-bottom-color: var(--rule-strong);
+  background: var(--red-wash-2);
+}
+
+/* ---------- 中堂: the hollow centre carries the native's data and the rays ---------- */
+.ziwei-center-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  grid-column: 2 / 4;
+  grid-row: 2 / 4;
+  min-width: 0;
+  padding: var(--s3) var(--s2);
+  background: var(--paper-hi);
+  text-align: center;
+}
+
+.ziwei-center-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Labels knock out the rays beneath them, as a printed table over ruled lines */
+.ziwei-center-title > span:first-child,
+.ziwei-center-bureau,
+.ziwei-center-facts > div,
+.ziwei-center-lunar,
+.ziwei-center-warn {
+  padding: 0 4px;
+  background: var(--paper-hi);
+}
+
+.ziwei-center-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 6px;
+  color: var(--ink);
+  font: 600 13px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-center-bureau {
+  color: var(--red);
+  font: 900 22px/1.15 var(--serif);
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
+}
+
+.ziwei-center-facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 10px;
+  margin: 0;
+}
+
+.ziwei-center-facts > div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.ziwei-center-facts dt {
+  color: var(--red);
+  font: 500 11px/1.6 var(--sans);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-center-facts dd {
+  margin: 0;
+  font: 600 13px/1.6 var(--serif);
+}
+
+.ziwei-center-lunar {
+  color: var(--gray);
+  font: 400 11px/1.4 var(--sans);
+}
+
+.ziwei-center-warn {
+  color: var(--ochre);
+  font: 500 11px/1.4 var(--sans);
+}
+
+/* 八字: four pillars set as vertical columns of a tiny ruled table */
+.ziwei-bazi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 34px);
+  margin: 4px 0 0;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper-hi);
+}
+
+.ziwei-bazi-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 0 5px;
+}
+
+.ziwei-bazi-col + .ziwei-bazi-col {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-bazi-label {
+  color: var(--red);
+  font: 500 11px/1.4 var(--sans);
+}
+
+.ziwei-bazi-val {
+  margin: 2px 0 0;
+  writing-mode: vertical-rl;
+  font: 700 16px/1.1 var(--serif);
+  letter-spacing: 0.08em;
+}
+
+/* 三方四正 rays: vermilion lines inside the hollow, from the selected palace */
+.ziwei-rays-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ziwei-ray {
+  fill: none;
+  stroke: var(--red);
+  stroke-opacity: 0.72;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.ziwei-ray.is-opp {
+  stroke-width: 1.5;
+}
+
+.ziwei-ray-dot {
+  fill: var(--red);
+}
+
+/* The one authored moment: rays draw out from the newly selected palace */
+.ziwei-rays-overlay.is-drawing .ziwei-ray {
+  animation: zw-ray-draw 560ms var(--ease-out) both;
+}
+
+.ziwei-rays-overlay.is-drawing .ziwei-ray.is-he {
+  animation-delay: 60ms;
+}
+
+.ziwei-rays-overlay.is-drawing .ziwei-ray.is-base {
+  animation-duration: 380ms;
+  animation-delay: 380ms;
+}
+
+.ziwei-rays-overlay.is-drawing .ziwei-ray-dot {
+  animation: cf-fade var(--t-base) var(--ease-out) both;
+}
+
+@keyframes zw-ray-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---------- Palace detail sheet ---------- */
+.ziwei-palace-detail-card {
+  min-width: 0;
+  container: zw-detail / inline-size;
+}
+
+.ziwei-palace-detail-card.is-entering {
+  animation: cf-sheet-in var(--t-slow) var(--ease-sheet) both;
+}
+
+.ziwei-palace-detail-card > * + * {
+  border-top: 1px solid var(--red);
+}
+
+.ziwei-detail-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 6px var(--s3);
+  padding: var(--s4) var(--s4) var(--s3);
+}
+
+.ziwei-detail-title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.ziwei-detail-main-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--red);
+  font: 900 26px/1.15 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-detail-main-title small {
+  color: var(--ink);
+  font: 600 15px/1 var(--serif);
+  letter-spacing: 0.08em;
+}
+
+.ziwei-detail-title-group .ziwei-shen-badge,
+.ziwei-detail-title-group .ziwei-yearly-badge,
+.ziwei-detail-tag {
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.ziwei-detail-tag {
+  display: inline-block;
+  border: 1px solid var(--hair-strong);
+  border-radius: 2px;
+  color: var(--gray);
+  font: 600 12px/1.2 var(--sans);
+}
+
+.ziwei-detail-actions {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.ziwei-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 2px 16px;
+  color: var(--gray);
+  font: 400 13px/1.6 var(--sans);
+}
+
+.ziwei-detail-meta b {
+  margin-right: 4px;
+  color: var(--red);
+  font: 600 12px/1.6 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-detail-meta span {
+  color: var(--ink-2);
+}
+
+/* Theme rows: the same dt | dd ruling as the almanac table */
+.ziwei-detail-theme-box {
+  margin: 0;
+}
+
+.ziwei-detail-theme-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+}
+
+.ziwei-detail-theme-row + .ziwei-detail-theme-row {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-theme-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border-right: 1px solid var(--rule);
+  color: var(--red);
+  font: 600 13px/1.3 var(--serif);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.ziwei-theme-text {
+  margin: 0;
+  padding: 9px 12px;
+  color: var(--ink);
+  font: 400 14px/1.65 var(--sans);
+}
+
+/* Sections: vertical vermilion heading column + ruled body */
+.ziwei-detail-section {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+
+.ziwei-detail-section > .cf-vh {
+  align-items: flex-start;
+  padding-top: 12px;
+}
+
+.ziwei-vh-count {
+  margin-top: 6px;
+  text-combine-upright: all;
+  -webkit-text-combine: horizontal;
+  font-weight: 900;
+}
+
+.ziwei-detail-body {
+  min-width: 0;
+}
+
+.ziwei-stars-detail-list > * + *,
+.ziwei-minor-detail-card + .ziwei-minor-detail-card,
+.ziwei-rule-item + .ziwei-rule-item,
+.ziwei-sanfang-card + .ziwei-sanfang-card {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-star-detail-row {
+  padding: 12px 14px 14px;
+}
+
+.ziwei-star-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.ziwei-star-name {
+  font: 900 20px/1.2 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-brightness-tag {
+  padding: 2px 6px;
+  border: 1px solid var(--hair-strong);
+  border-radius: 2px;
+  color: var(--gray);
+  font: 700 12px/1.2 var(--serif);
+}
+
+.ziwei-brightness-tag.is-strong {
+  border-color: var(--rule-strong);
+  color: var(--red);
+}
+
+.ziwei-brightness-tag.is-weak {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.ziwei-star-detail-head .ziwei-sihua-tag {
+  padding: 3px 5px;
+  font-size: 12px;
+}
+
+.ziwei-star-nature {
+  color: var(--gray);
+  font: 400 12px/1.4 var(--sans);
+}
+
+.ziwei-star-detail-body {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.ziwei-star-detail-body > div {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.ziwei-star-detail-body dt {
+  padding-top: 2px;
+  color: var(--red);
+  font: 600 12px/1.6 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-star-detail-body dd {
+  margin: 0;
+  color: var(--ink);
+  font: 400 14px/1.65 var(--sans);
+}
+
+.ziwei-advice {
+  color: var(--red);
+}
+
+.ziwei-empty-palace-box {
+  padding: 12px 14px 14px;
+  font: 400 14px/1.65 var(--sans);
+}
+
+.ziwei-empty-palace-box strong {
+  display: block;
+  margin-bottom: 4px;
+  font: 700 15px/1.5 var(--serif);
+}
+
+.ziwei-empty-palace-box p {
+  color: var(--ink-2);
+}
+
+.ziwei-empty-palace-box p + p {
+  margin-top: 6px;
+  color: var(--ink);
+}
+
+.ziwei-minor-detail-grid,
+.ziwei-rules-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ziwei-minor-detail-card {
+  padding: 10px 14px 12px;
+}
+
+.ziwei-minor-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ziwei-minor-card-head .ziwei-minor-chip {
+  font: 700 16px/1.3 var(--serif);
+}
+
+.ziwei-minor-kind {
+  color: var(--gray);
+  font: 400 12px/1.4 var(--sans);
+}
+
+.ziwei-minor-trad {
+  color: var(--ink-2);
+  font: 400 13px/1.6 var(--sans);
+}
+
+.ziwei-minor-modern {
+  margin-top: 4px;
+  color: var(--ink);
+  font: 400 14px/1.6 var(--sans);
+}
+
+.ziwei-rule-item {
+  padding: 12px 14px 14px;
+}
+
+.ziwei-rule-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 6px;
+}
+
+.ziwei-rule-name {
+  color: var(--red);
+  font: 700 16px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-rule-summary {
+  color: var(--ink);
+  font: 600 14px/1.6 var(--serif);
+}
+
+.ziwei-rule-desc {
+  margin-top: 4px;
+  color: var(--ink-2);
+  font: 400 13.5px/1.65 var(--sans);
+}
+
+.ziwei-rule-tech {
+  margin-top: 6px;
+  color: var(--ink-2);
+  font: 400 13px/1.6 var(--sans);
+}
+
+.ziwei-rule-tech b,
+.ziwei-sanfang-stars b {
+  margin-right: 4px;
+  color: var(--red);
+  font: 600 12px/1.6 var(--serif);
+}
+
+/* 三方四正: three ruled rows that jump to the related palace */
+.ziwei-sanfang-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ziwei-sanfang-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "kind main go"
+    "kind stars go"
+    "kind role go";
+  align-items: center;
+  gap: 2px 10px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px 10px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.ziwei-sanfang-card:hover {
+  background: var(--red-wash);
+}
+
+.ziwei-sanfang-card:active {
+  background: var(--red-wash-2);
+}
+
+.ziwei-sanfang-card:focus-visible {
+  outline-offset: -3px;
+}
+
+.ziwei-sanfang-kind {
+  grid-area: kind;
+  align-self: start;
+  min-width: 4.2em;
+  margin-top: 2px;
+  padding: 3px 5px;
+  text-align: center;
+  border: 1px solid var(--red);
+  border-radius: 2px;
+  color: var(--red);
+  font: 700 12px/1.2 var(--serif);
+  white-space: nowrap;
+}
+
+.ziwei-sanfang-kind.is-opp {
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.ziwei-sanfang-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  grid-area: main;
+}
+
+.ziwei-sanfang-main b {
+  font: 700 16px/1.35 var(--serif);
+}
+
+.ziwei-sanfang-main span {
+  color: var(--gray);
+  font: 500 13px/1.35 var(--serif);
+}
+
+.ziwei-sanfang-stars {
+  grid-area: stars;
+  font: 400 13px/1.5 var(--sans);
+}
+
+.ziwei-sanfang-role {
+  grid-area: role;
+  color: var(--gray);
+  font: 400 12px/1.5 var(--sans);
+}
+
+.ziwei-sanfang-go {
+  display: inline-flex;
+  grid-area: go;
+  align-items: center;
+  gap: 2px;
+  color: var(--red);
+  font: 500 12px/1 var(--sans);
+}
+
+.ziwei-sanfang-synthesis {
+  margin: 0;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+  font: 400 13.5px/1.65 var(--sans);
+}
+
+.ziwei-detail-footer {
+  padding: 8px 14px 10px;
+  color: var(--gray);
+  font: 400 11px/1.5 var(--sans);
+  text-align: right;
+}
+
+@container zw-detail (min-width: 640px) {
+  .ziwei-minor-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ziwei-minor-detail-card + .ziwei-minor-detail-card {
+    border-top: 0;
+  }
+
+  .ziwei-minor-detail-card:nth-child(even) {
+    border-left: 1px solid var(--rule);
+  }
+
+  .ziwei-minor-detail-card:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+}
+
+/* ---------- 流年: a ruled band below the sheets ---------- */
+.ziwei-yearly-wrap {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  margin-top: var(--s6);
+  border-top: 2px solid var(--red);
+  border-bottom: 1px solid var(--red);
+}
+
+.ziwei-yearly-wrap > .cf-vh {
+  align-items: flex-start;
+  padding-top: 14px;
+}
+
+.ziwei-yearly-main {
+  min-width: 0;
+}
+
+.ziwei-yearly-head {
+  padding: 12px 14px;
+}
+
+.ziwei-yearly-head h3 {
+  font: 700 20px/1.4 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-yearly-year {
+  margin-right: 4px;
+  color: var(--red);
+  font-weight: 900;
+}
+
+.ziwei-yearly-sihua {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--red);
+}
+
+.ziwei-yearly-sihua > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 10px;
+}
+
+.ziwei-yearly-sihua > div + div {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-yearly-sihua dt {
+  font: 700 12px/1.3 var(--serif);
+}
+
+.ziwei-yearly-sihua dd {
+  margin: 0;
+  font: 700 16px/1.3 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-yearly-sihua .lu dt,
+.ziwei-yearly-sihua .quan dt,
+.ziwei-yearly-sihua .ke dt {
+  color: var(--red);
+}
+
+.ziwei-yearly-sihua .ji dt {
+  color: var(--ink);
+}
+
+.ziwei-yearly-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ziwei-yearly-card {
+  padding: 12px 14px 14px;
+}
+
+.ziwei-yearly-card + .ziwei-yearly-card {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-yearly-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+  font: 700 17px/1.4 var(--serif);
+}
+
+.ziwei-yearly-factor {
+  padding: 1px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  color: var(--red);
+  font: 500 12px/1.5 var(--sans);
+}
+
+.ziwei-yearly-card-desc {
+  max-width: 68ch;
+  margin-top: 6px;
+  color: var(--ink-2);
+  font: 400 14px/1.7 var(--sans);
+}
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 600px) {
+  .ziwei-mode-switch.cf-modes {
+    width: auto;
+    display: inline-grid;
+  }
+
+  .ziwei-center-bureau {
+    font-size: 26px;
+  }
+
+  .ziwei-bazi-strip {
+    grid-template-columns: repeat(4, 42px);
+  }
+
+  .ziwei-bazi-val {
+    font-size: 19px;
+  }
+}
+
+/* Roomy cells: every note of the palace prints in the table */
+@media (min-width: 700px) {
+  .ziwei-grid {
+    grid-template-rows: repeat(4, minmax(128px, 1fr));
+  }
+
+  .ziwei-palace-head {
+    padding: 7px 8px 5px;
+  }
+
+  .ziwei-palace-name b {
+    font-size: 15px;
+  }
+
+  .ziwei-branch-tag {
+    font-size: 12px;
+  }
+
+  .ziwei-stars-area {
+    gap: 3px;
+    padding: 7px 8px;
+  }
+
+  .ziwei-star-item b {
+    font-size: 16px;
+  }
+
+  .ziwei-star-bright {
+    font-size: 12px;
+  }
+
+  .ziwei-minor-chip {
+    font-size: 12.5px;
+  }
+
+  .ziwei-sihua-hua {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+
+  .ziwei-palace-foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 4px 8px 6px;
+  }
+
+  .ziwei-role {
+    display: block;
+    grid-column: 1 / -1;
+    overflow: hidden;
+    color: var(--gray);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ziwei-opp {
+    display: block;
+    text-align: right;
+  }
+
+  .ziwei-daxian-badge {
+    font-size: 12px;
+  }
+
+  .ziwei-center-title {
+    font-size: 15px;
+  }
+
+  .ziwei-center-facts dd {
+    font-size: 15px;
+  }
+
+  .ziwei-center-lunar {
+    font-size: 12px;
+  }
+
+  .ziwei-yearly-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ziwei-yearly-card + .ziwei-yearly-card {
+    border-top: 0;
+  }
+
+  .ziwei-yearly-card:nth-child(even) {
+    border-left: 1px solid var(--rule);
+  }
+
+  .ziwei-yearly-card:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+}
+
+/* Chart and detail side by side: tap a palace, read it beside the table */
+@media (min-width: 1080px) {
+  .ziwei-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(330px, 1fr);
+    column-gap: var(--s5);
+  }
+}
+
+@media (pointer: coarse) {
+  .cf-mode {
+    min-height: var(--tap);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ziwei-rays-overlay.is-drawing .ziwei-ray,
+  .ziwei-palace-detail-card.is-entering {
+    animation-name: cf-fade;
+  }
+}

@@ -1,0 +1,1331 @@
+/* ==========================================================================
+   靈籤求索 · 媽祖六十甲子籤 — 紅黑雙色農民曆
+   The lot is printed as an almanac slip: double vermilion frame, ruled rows,
+   vertical heading columns, poem set vertically, rank stamped as a seal.
+   Tokens and shared parts (.cf-sheet, .cf-vh, .cf-seal, .cf-row) live in
+   base.css and fortune.css.
+   ========================================================================== */
+
+.oracle-hub-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s5);
+  min-width: 0;
+}
+
+/* ---- Head: title and the three modes ---- */
+.oracle-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s3) var(--s5);
+}
+
+.oracle-head-text {
+  min-width: 0;
+}
+
+.oracle-title {
+  color: var(--ink);
+  font: 700 22px/1.3 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-title-sub {
+  margin-top: 2px;
+  color: var(--gray);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.oracle-modes {
+  display: grid;
+  flex: 1 1 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.oracle-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 0;
+  background: var(--paper-hi);
+  color: var(--ink-2);
+  font: 500 14px/1.2 var(--sans);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.oracle-mode-btn + .oracle-mode-btn {
+  border-left: 1px solid var(--rule-strong);
+}
+
+.oracle-mode-btn:hover {
+  background: color-mix(in srgb, var(--red) 8%, var(--paper-hi));
+  color: var(--ink);
+}
+
+.oracle-mode-btn.is-active {
+  background: var(--red);
+  color: var(--on-red);
+  font-weight: 700;
+}
+
+.oracle-mode-btn:focus-visible {
+  outline-offset: -4px;
+}
+
+.oracle-mode-btn.is-active:focus-visible {
+  outline-color: var(--on-red);
+}
+
+.oracle-mode-count {
+  min-width: 20px;
+  padding: 0 5px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font: 600 12px/17px var(--serif);
+  letter-spacing: 0;
+  text-align: center;
+}
+
+@media (max-width: 479px) {
+  .oracle-mode-btn {
+    padding: 0 6px;
+    letter-spacing: 0;
+  }
+
+  .oracle-mode-btn .btn-icon {
+    display: none;
+  }
+}
+
+@media (min-width: 720px) {
+  .oracle-modes {
+    flex: 0 1 auto;
+    grid-template-columns: repeat(3, auto);
+  }
+}
+
+/* ---- Shared fields ---- */
+.oracle-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.oracle-field-label {
+  color: var(--ink-2);
+  font: 500 13px/1.4 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.oracle-field input,
+.oracle-field select {
+  width: 100%;
+}
+
+.oracle-note {
+  color: var(--gray);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.oracle-loading {
+  padding: var(--s6) var(--s4);
+  color: var(--gray);
+  font-family: var(--serif);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Draw: the ask sheet (所問之事 | 虔心搖籤)
+   ========================================================================== */
+.oracle-draw {
+  container-type: inline-size;
+}
+
+.oracle-ask {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.oracle-ask-part,
+.oracle-altar {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.oracle-altar {
+  border-top: 1px solid var(--red);
+}
+
+.oracle-ask-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+  padding: var(--s4);
+}
+
+.oracle-ask-desc {
+  color: var(--ink-2);
+  font: 500 15px/1.7 var(--serif);
+}
+
+/* Topic choice: a ruled table of six cells */
+.oracle-topic-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--rule);
+  background: var(--rule);
+}
+
+.oracle-topic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 6px;
+  border: 0;
+  background: var(--paper-hi);
+  color: var(--ink-2);
+  font: 500 14px/1.2 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.oracle-topic:hover {
+  background: color-mix(in srgb, var(--red) 6%, var(--paper-hi));
+  color: var(--ink);
+}
+
+.oracle-topic.is-active {
+  background: color-mix(in srgb, var(--red) 8%, var(--paper-hi));
+  box-shadow: inset 0 0 0 1px var(--red);
+  color: var(--red);
+  font-weight: 700;
+}
+
+.oracle-topic:focus-visible {
+  outline-offset: -4px;
+}
+
+.oracle-topic:disabled {
+  cursor: default;
+}
+
+/* The three steps of the rite: ruled rows, shown where the sheet has room */
+.oracle-rite {
+  display: none;
+  margin: var(--s2) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  list-style: none;
+  counter-reset: oracle-rite;
+}
+
+.oracle-rite li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 4px;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.oracle-rite li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.oracle-rite li::before {
+  counter-increment: oracle-rite;
+  content: counter(oracle-rite, cjk-ideographic);
+  flex: none;
+  color: var(--red);
+  font: 700 15px/1.4 var(--serif);
+}
+
+/* The altar: cylinder, draw button, note */
+.oracle-altar-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+  padding: var(--s5) var(--s4) var(--s4);
+  text-align: center;
+}
+
+.oracle-cylinder {
+  position: relative;
+  width: 176px;
+  height: 176px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.oracle-cylinder img {
+  position: absolute;
+  pointer-events: none;
+}
+
+.oracle-cylinder-img {
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: 50% 88%;
+  transition: transform var(--t-base) var(--ease-out);
+}
+
+.oracle-cylinder:hover .oracle-cylinder-img {
+  transform: translateY(-3px);
+}
+
+[data-theme="dark"] .oracle-cylinder-img {
+  filter: url(#oracle-matte-soft);
+}
+
+/* One stick waits inside the cylinder; it rises during the draw */
+.oracle-cylinder-stick {
+  top: 0;
+  left: 50%;
+  z-index: 0;
+  width: 56%;
+  height: auto;
+  opacity: 0;
+  filter: url(#oracle-matte);
+  transform: translate(-50%, 34%);
+}
+
+.oracle-draw-btn {
+  min-width: 200px;
+}
+
+.oracle-draw-hint {
+  max-width: 22em;
+  color: var(--gray);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@container (min-width: 760px) {
+  .oracle-ask {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  }
+
+  .oracle-altar {
+    border-top: 0;
+    border-left: 1px solid var(--red);
+  }
+
+  .oracle-ask-body {
+    padding: var(--s5);
+  }
+
+  .oracle-rite {
+    display: block;
+  }
+
+  .oracle-topic-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .oracle-topic {
+    flex-direction: column;
+    gap: 6px;
+    min-height: 76px;
+    font-size: 15px;
+  }
+
+  .oracle-ask-desc {
+    font-size: 16px;
+  }
+
+  .oracle-altar-body {
+    justify-content: center;
+    padding: var(--s6) var(--s5);
+  }
+
+  .oracle-cylinder {
+    width: 264px;
+    height: 264px;
+  }
+}
+
+/* ==========================================================================
+   Result: the lot slip on a double-framed sheet
+   ========================================================================== */
+.oracle-result {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  min-width: 0;
+}
+
+/* Actions: one row of four on a phone, a quiet button row on wider sheets */
+.oracle-actions {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--s2);
+}
+
+.oracle-act {
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 6px 4px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.oracle-saved {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--red-wash);
+  color: var(--red);
+  font: 600 13px/1.2 var(--sans);
+  white-space: nowrap;
+}
+
+@container (min-width: 560px) {
+  .oracle-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .oracle-act {
+    flex-direction: row;
+    gap: 6px;
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+.oracle-slip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Both columns run to the foot so the heading columns and rules close the table */
+.oracle-slip-main,
+.oracle-slip-read {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.oracle-slip-poem,
+.oracle-slip-read > section:last-child {
+  flex: 1 0 auto;
+}
+
+.oracle-slip-main > section + section,
+.oracle-slip-read > section + section,
+.oracle-slip-read {
+  border-top: 1px solid var(--red);
+}
+
+/* Head: number · 干支 · seal, the same grammar as the almanac day block */
+.oracle-slip-head {
+  display: grid;
+  grid-template-columns: minmax(96px, 1.1fr) 72px minmax(112px, 1.3fr);
+}
+
+.oracle-slip-head > div + div {
+  border-left: 1px solid var(--rule);
+}
+
+.oracle-slip-no {
+  padding: 14px 8px 16px;
+  color: var(--red);
+  font-family: var(--serif);
+  text-align: center;
+}
+
+.oracle-slip-no small {
+  display: block;
+  font: 600 13px/16px var(--serif);
+  letter-spacing: 0.12em;
+}
+
+.oracle-slip-no strong {
+  display: block;
+  margin: 8px 0 6px;
+  font: 900 clamp(60px, 18cqw, 88px)/0.92 var(--serif);
+  letter-spacing: -0.03em;
+}
+
+.oracle-slip-title {
+  color: var(--ink);
+  font: 600 15px/20px var(--serif);
+  letter-spacing: 0.16em;
+}
+
+.oracle-slip-gz {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.oracle-gz {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  color: var(--gray);
+  font: 500 12px/20px var(--serif);
+  letter-spacing: 0.1em;
+}
+
+.oracle-gz p {
+  margin: 0;
+}
+
+.oracle-gz-main {
+  color: var(--ink);
+  font: 700 26px/32px var(--serif);
+  letter-spacing: 0.08em;
+}
+
+.oracle-slip-rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 8px;
+  text-align: center;
+}
+
+.oracle-slip-rank p {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--red);
+  font: 600 13px/18px var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-slip-rank p b {
+  font: 700 15px/20px var(--serif);
+  letter-spacing: 0.2em;
+}
+
+/* Rank seal: one, two or four characters */
+.oracle-seal > span {
+  display: block;
+}
+
+.oracle-seal.is-one {
+  font-size: 40px;
+}
+
+.oracle-seal.is-four {
+  letter-spacing: 0;
+  text-indent: 0;
+}
+
+.oracle-seal.is-four > span {
+  writing-mode: vertical-rl;
+  inline-size: 2.1em;
+  font-size: 25px;
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+/* 所問 row reuses the almanac ruled row */
+.oracle-slip-asked .cf-row dd b {
+  overflow-wrap: anywhere;
+}
+
+/* The poem: a printed slip, read top-to-bottom, right-to-left */
+.oracle-slip-poem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  padding: var(--s5) var(--s3);
+}
+
+.oracle-stick {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 236px;
+  margin: 0;
+  container-type: size;
+}
+
+/* Bamboo patch over the art's fixed carving, re-carved with the drawn lot's number.
+   Colours are sampled from the stick raster, so they stay the same in both themes. */
+.oracle-stick-carve {
+  position: absolute;
+  top: 36.5cqh;
+  left: 50%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 6.4cqh;
+  height: 39.5cqh;
+  padding-top: 0.5cqh;
+  overflow: hidden;
+  transform: translateX(-50%);
+  border-radius: 1px;
+  background: #c79c57;
+  color: #4a2c0c;
+  font: 700 3.1cqh/1.02 var(--serif);
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.oracle-stick img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: url(#oracle-matte);
+  pointer-events: none;
+  user-select: none;
+}
+
+.oracle-paper {
+  position: relative;
+  flex: 0 1 272px;
+  min-width: 0;
+  aspect-ratio: 3 / 4;
+  padding: 23% 13% 12%;
+  background: url("../img/oracle/oracle-slip-bg.png") center / 100% 100% no-repeat;
+  container-type: inline-size;
+}
+
+.oracle-poem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5em;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  writing-mode: vertical-rl;
+  color: var(--ink);
+  font: 700 clamp(18px, 10cqw, 30px)/1.25 var(--serif);
+  letter-spacing: 0.14em;
+}
+
+.oracle-poem li {
+  margin: 0;
+}
+
+/* Dark print: the slip is reprinted as light ink on dark paper */
+[data-theme="dark"] .oracle-paper {
+  background: none;
+}
+
+[data-theme="dark"] .oracle-paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../img/oracle/oracle-slip-bg.png") center / 100% 100% no-repeat;
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.72;
+}
+
+/* Reading rows: vertical heading column + body */
+.oracle-read {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.oracle-read-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px 16px;
+}
+
+.oracle-story-title {
+  font: 700 17px/1.5 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.oracle-story-sum {
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.oracle-meaning {
+  font: 500 16px/1.85 var(--serif);
+}
+
+.oracle-topics-body {
+  min-width: 0;
+}
+
+.oracle-topic-row dd p {
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.oracle-topic-row.is-asked dt {
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.oracle-topic-row.is-asked dd p {
+  color: var(--ink);
+  font: 500 15px/1.75 var(--serif);
+}
+
+.oracle-more {
+  border-top: 1px solid var(--rule);
+}
+
+.oracle-more > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  color: var(--red);
+  font: 500 13px/1.5 var(--sans);
+  list-style: none;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.oracle-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.oracle-more > summary:hover {
+  background: var(--red-wash);
+}
+
+.oracle-more > summary:focus-visible {
+  outline-offset: -3px;
+}
+
+.oracle-more-chev {
+  display: inline-flex;
+  flex: none;
+  transition: transform var(--t-base) var(--ease-out);
+}
+
+.oracle-more[open] .oracle-more-chev {
+  transform: rotate(90deg);
+}
+
+.oracle-more > dl {
+  border-top: 1px solid var(--rule);
+}
+
+.oracle-guides-title {
+  color: var(--red);
+  font: 600 14px/1.5 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-guides {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: oracle-guide;
+}
+
+.oracle-guides li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 6px;
+  padding: 8px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.oracle-guides li + li {
+  border-top: 1px solid var(--rule);
+}
+
+.oracle-guides li::before {
+  counter-increment: oracle-guide;
+  content: counter(oracle-guide, cjk-ideographic);
+  color: var(--red);
+  font: 700 14px/1.7 var(--serif);
+}
+
+.oracle-slip-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 16px;
+  grid-column: 1 / -1;
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--red);
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Wide sheet: slip on the left, reading on the right */
+@container (min-width: 720px) {
+  .oracle-slip {
+    grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1fr);
+  }
+
+  .oracle-slip-read {
+    border-top: 0;
+    border-left: 1px solid var(--red);
+  }
+
+  .oracle-paper {
+    flex-basis: 300px;
+  }
+
+  .oracle-stick {
+    height: 252px;
+  }
+}
+
+/* ==========================================================================
+   Browse: 六十甲子籤譜 (ten stems × six lots)
+   ========================================================================== */
+.oracle-browse {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s5);
+  align-items: start;
+}
+
+.oracle-browse-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  min-width: 0;
+}
+
+.oracle-browse-note {
+  color: var(--gray);
+  font-size: 13px;
+}
+
+.oracle-matrix-title {
+  margin-top: var(--s2);
+  color: var(--red);
+  font: 700 15px/1.4 var(--serif);
+  letter-spacing: 0.12em;
+}
+
+.oracle-matrix {
+  display: grid;
+  grid-template-columns: 28px repeat(6, minmax(0, 1fr));
+  grid-auto-rows: minmax(40px, auto);
+  gap: 1px;
+  border: 1px solid var(--rule-strong);
+  background: var(--rule);
+}
+
+.oracle-matrix-row {
+  display: contents;
+}
+
+.oracle-matrix-stem {
+  display: grid;
+  place-items: center;
+  background: var(--paper-hi);
+  color: var(--red);
+  font: 700 15px/1 var(--serif);
+}
+
+.oracle-num {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: var(--paper-hi);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.oracle-num b {
+  font: 600 15px/1.15 var(--serif);
+  font-variant-numeric: tabular-nums;
+}
+
+.oracle-num small {
+  color: var(--gray);
+  font: 500 11px/1.2 var(--serif);
+}
+
+.oracle-num.is-good b {
+  color: var(--red);
+}
+
+.oracle-num:hover {
+  background: color-mix(in srgb, var(--red) 8%, var(--paper-hi));
+}
+
+.oracle-num.is-active {
+  background: var(--red);
+}
+
+.oracle-num.is-active b,
+.oracle-num.is-active small {
+  color: var(--on-red);
+}
+
+.oracle-num:focus-visible {
+  outline-offset: -4px;
+}
+
+.oracle-num.is-active:focus-visible {
+  outline-color: var(--on-red);
+}
+
+.oracle-matrix-legend {
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.oracle-matrix-legend b {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.oracle-browse-slip {
+  min-width: 0;
+  transition: opacity var(--t-fast) var(--ease-out);
+}
+
+.oracle-browse-slip.is-pending {
+  opacity: 0.55;
+}
+
+@media (pointer: coarse) {
+  .oracle-matrix {
+    grid-auto-rows: minmax(var(--tap), auto);
+  }
+}
+
+@media (min-width: 960px) {
+  .oracle-browse {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: var(--s6);
+  }
+
+  .oracle-browse-nav {
+    position: sticky;
+    top: calc(var(--topbar-h) + 72px);
+  }
+}
+
+/* ==========================================================================
+   Records: ledger of saved lots
+   ========================================================================== */
+.oracle-records {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.oracle-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s3) var(--s4);
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.oracle-filter-bar .oracle-field {
+  flex: 1 1 140px;
+  max-width: 240px;
+}
+
+.oracle-filter-total {
+  margin-left: auto;
+  padding-bottom: 8px;
+  color: var(--gray);
+  font-size: 13px;
+}
+
+.oracle-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+}
+
+.oracle-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  min-width: 0;
+  padding: 12px 10px;
+}
+
+.oracle-stat + .oracle-stat {
+  border-left: 1px solid var(--rule);
+}
+
+.oracle-stat dt {
+  color: var(--red);
+  font: 600 12px/16px var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-stat dd {
+  margin: 0;
+  font: 700 26px/1.2 var(--serif);
+}
+
+.oracle-stat dd.is-red {
+  color: var(--red);
+}
+
+.oracle-ledger-body {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.oracle-stats + .oracle-ledger-body {
+  border-top: 1px solid var(--red);
+}
+
+.oracle-record-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oracle-record {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 0 12px;
+  min-width: 0;
+  padding: 14px 14px 12px 8px;
+}
+
+.oracle-record + .oracle-record {
+  border-top: 1px solid var(--rule);
+}
+
+.oracle-record-no {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--red);
+  text-align: center;
+}
+
+.oracle-record-no strong {
+  font: 900 34px/1 var(--serif);
+  letter-spacing: -0.02em;
+}
+
+.oracle-record-no span {
+  color: var(--ink);
+  font: 600 13px/18px var(--serif);
+  letter-spacing: 0.08em;
+}
+
+.oracle-record-no em {
+  color: var(--red);
+  font: 700 12px/16px var(--serif);
+  font-style: normal;
+}
+
+.oracle-record-no em.is-ink {
+  color: var(--ink);
+}
+
+.oracle-record-no small {
+  color: var(--gray);
+  font: 500 11px/14px var(--serif);
+}
+
+.oracle-record-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.oracle-record-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.oracle-record-topic {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--red);
+  font: 600 13px/1.4 var(--sans);
+}
+
+.oracle-record-topic .btn-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.oracle-record-date {
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.oracle-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-left: auto;
+  padding: 0 10px;
+  border: 1px solid var(--hair-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: 600 12px/1 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+
+.oracle-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.oracle-status:hover {
+  border-color: var(--red);
+}
+
+.oracle-status.is-fulfilled {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.oracle-status.is-insight {
+  border-color: var(--rule-strong);
+  background: var(--red-wash);
+  color: var(--red);
+}
+
+.oracle-status.is-unfulfilled {
+  border-color: var(--hair);
+  color: var(--gray);
+}
+
+.oracle-record-ask {
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.oracle-record-ask b {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.oracle-record-poem {
+  font: 600 15px/1.7 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-record-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule-strong);
+}
+
+.oracle-record-notes span {
+  color: var(--red);
+  font: 600 12px/1.5 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.oracle-record-notes p {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.oracle-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.oracle-del {
+  color: var(--red-deep);
+}
+
+.oracle-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s7) var(--s4);
+  text-align: center;
+}
+
+.oracle-empty-title {
+  font: 700 17px/1.5 var(--serif);
+}
+
+.oracle-empty-desc {
+  max-width: 28em;
+  color: var(--gray);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media (pointer: coarse) {
+  .oracle-status,
+  .oracle-record-actions .btn {
+    min-height: var(--tap);
+  }
+
+  .oracle-del {
+    min-width: var(--tap);
+  }
+}
+
+@media (min-width: 960px) {
+  .oracle-record-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oracle-record + .oracle-record {
+    border-top: 0;
+  }
+
+  .oracle-record:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+  }
+
+  .oracle-record:nth-child(even) {
+    border-left: 1px solid var(--rule);
+  }
+}
+
+/* ==========================================================================
+   Motion — the drawing ritual (≤ 1.2 s, only on a new draw):
+   shake (≥ 380 ms, while the lot is fetched) → one stick rises (240 ms)
+   → the slip lands (340 ms) → the rank seal stamps (380 ms, +100 ms)
+   ========================================================================== */
+@keyframes oracle-shake {
+  0%,
+  100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg) translateX(-2px); }
+  75% { transform: rotate(5deg) translateX(2px); }
+}
+
+@keyframes oracle-rise {
+  from { opacity: 0; transform: translate(-50%, 34%); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: translate(-50%, -40%); }
+}
+
+@keyframes oracle-land {
+  from { opacity: 0; transform: translateY(-14px) scale(1.012); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes oracle-stick-in {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: none; }
+}
+
+.oracle-cylinder.is-shaking .oracle-cylinder-img {
+  animation: oracle-shake 140ms ease-in-out 8; /* bounded; the rise replaces it after ~380 ms */
+}
+
+.oracle-cylinder.is-rising .oracle-cylinder-stick {
+  animation: oracle-rise 240ms var(--ease-out) both;
+}
+
+.oracle-slip.is-landing {
+  animation: oracle-land 340ms var(--ease-out) both;
+}
+
+.oracle-slip.is-landing .oracle-stick {
+  animation: oracle-stick-in 340ms var(--ease-out) both;
+}
+
+.oracle-slip.is-landing .oracle-seal {
+  animation: cf-stamp 380ms var(--ease-stamp) 100ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oracle-cylinder.is-shaking .oracle-cylinder-img,
+  .oracle-cylinder.is-rising .oracle-cylinder-stick {
+    animation: none;
+  }
+
+  .oracle-cylinder.is-shaking {
+    opacity: 0.7;
+  }
+
+  .oracle-slip.is-landing,
+  .oracle-slip.is-landing .oracle-stick,
+  .oracle-slip.is-landing .oracle-seal {
+    animation-name: cf-fade;
+    animation-delay: 0ms;
+  }
+}

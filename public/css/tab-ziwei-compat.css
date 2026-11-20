@@ -1,0 +1,1224 @@
+/* ==========================================================================
+   紫微斗數 雙人合盤 — 紅黑雙色農民曆
+   Two ruled 生辰帖 (甲 / 乙) feed one framed 合盤 sheet: the pair faces each
+   other across a vermilion seal, a three-cell tally is the shared verdict,
+   and every view below is set in the almanac's ruled-table grammar.
+   Tokens and shared parts (.cf-sheet, .cf-vh, .cf-seal, keyframes) live in base.css.
+   ========================================================================== */
+
+.ziwei-compat-host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s5);
+  min-width: 0;
+}
+
+/* The 單人命盤 / 雙人合盤 switch belongs to the Ziwei tab stylesheet.
+   Zero-specificity fallback only, so any rule in tab-ziwei.css wins. */
+:where(.ziwei-mode-switch) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-bottom: var(--s4);
+}
+
+/* ---------- 生辰帖: the A / B birth slips ---------- */
+.ziwei-compat-pair-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s4);
+}
+
+.ziwei-compat-slip {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid var(--red);
+  background: var(--paper-hi);
+}
+
+.ziwei-compat-slip-vh {
+  align-items: flex-start;
+  padding-top: 15px;
+  border-right: 0;
+  background: var(--red);
+}
+
+.ziwei-compat-slip-vh > span {
+  color: var(--on-red);
+  font: 900 20px/1 var(--serif);
+  letter-spacing: 0;
+}
+
+.ziwei-compat-slip-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ziwei-compat-slip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  min-height: 52px;
+  padding: 6px 10px 6px 14px;
+  border-bottom: 1px solid var(--red);
+}
+
+.ziwei-compat-slip-title {
+  min-width: 0;
+  font: 700 18px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-compat-profile-btn {
+  flex: none;
+}
+
+/* Ruled rows: vermilion label cell + control cell */
+.ziwei-compat-row {
+  display: grid;
+  grid-template-columns: 6.5em minmax(0, 1fr);
+  min-height: 56px;
+}
+
+.ziwei-compat-row + .ziwei-compat-row {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-compat-row-label {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px 6px 14px;
+  border-right: 1px solid var(--rule);
+  color: var(--red);
+  font: 600 13px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.ziwei-compat-row-ctl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+  padding: 6px 10px 6px 12px;
+}
+
+.ziwei-compat-row-ctl > .input,
+.ziwei-compat-row-ctl > .select {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+.ziwei-compat-row-ctl > .ziwei-compat-cal {
+  flex: 0 0 6.5em;
+}
+
+.ziwei-compat-row-ctl > .ziwei-compat-date {
+  flex: 1 1 9em;
+}
+
+.ziwei-compat-row-ctl > .input[type="date"],
+.ziwei-compat-row-ctl > .input[type="time"] {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ziwei-compat-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ziwei-compat-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.ziwei-compat-inline-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: 10px 12px 12px 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--ochre);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ziwei-compat-inline-warn .btn-icon,
+.ziwei-compat-stale .btn-icon {
+  margin-top: 2px;
+}
+
+/* ---------- Submit row ---------- */
+.ziwei-compat-submit-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.ziwei-compat-submit {
+  width: 100%;
+}
+
+.ziwei-compat-policy {
+  order: 2;
+  max-width: 72ch;
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ---------- The 合盤 sheet ---------- */
+.ziwei-compat-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  min-width: 0;
+}
+
+.ziwei-compat-stale {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--ochre) 55%, transparent);
+  border-radius: var(--radius);
+  color: var(--ochre);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ziwei-compat-sheet {
+  min-width: 0;
+  transition: opacity var(--t-base) var(--ease-out);
+}
+
+.ziwei-compat-sheet.is-loading {
+  opacity: 0.55;
+}
+
+.ziwei-compat-sheet > * + * {
+  border-top: 1px solid var(--red);
+}
+
+/* 甲 · seal · 乙 */
+.ziwei-compat-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 108px minmax(0, 1fr);
+}
+
+.ziwei-compat-head > * + * {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-compat-party {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 14px 8px 16px;
+  text-align: center;
+}
+
+.ziwei-compat-party-glyph {
+  color: var(--red);
+  font: 900 clamp(52px, 15vw, 84px)/0.95 var(--serif);
+}
+
+.ziwei-compat-party-name {
+  margin-top: 8px;
+  max-width: 100%;
+  font: 700 16px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+.ziwei-compat-party-meta {
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ziwei-compat-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 16px 6px;
+}
+
+.ziwei-compat-seal-caption {
+  color: var(--red);
+  font: 600 12px/1.5 var(--serif);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.ziwei-compat-seal-caption span {
+  display: block;
+}
+
+/* Shared verdict: the three-category tally (no total score) */
+.ziwei-compat-tally {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.ziwei-compat-tally-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 6px 12px;
+  text-align: center;
+}
+
+.ziwei-compat-tally-cell + .ziwei-compat-tally-cell {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-compat-tally dt {
+  color: var(--red);
+  font: 600 12px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-compat-tally dd {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin: 0;
+}
+
+.ziwei-compat-tally b {
+  font: 900 30px/1.1 var(--serif);
+}
+
+.ziwei-compat-tally .is-support b {
+  color: var(--red);
+}
+
+.ziwei-compat-tally .is-insufficient b {
+  color: var(--ink-2);
+}
+
+.ziwei-compat-tally small {
+  color: var(--gray);
+  font: 600 12px/1 var(--serif);
+}
+
+/* View row: ruled cells, active one underlined in vermilion */
+.ziwei-compat-views {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ziwei-compat-view-btn {
+  position: relative;
+  min-height: 48px;
+  padding: 8px 6px;
+  border: 0;
+  background: none;
+  color: var(--gray);
+  font: 500 14px/1.3 var(--sans);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out);
+}
+
+.ziwei-compat-view-btn + .ziwei-compat-view-btn {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-compat-view-btn::after {
+  content: "";
+  position: absolute;
+  right: 16%;
+  bottom: 0;
+  left: 16%;
+  height: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+}
+
+.ziwei-compat-view-btn:hover {
+  background: var(--red-wash);
+  color: var(--ink);
+}
+
+.ziwei-compat-view-btn:active {
+  color: var(--red);
+}
+
+.ziwei-compat-view-btn.is-active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ziwei-compat-view-btn.is-active::after {
+  transform: none;
+}
+
+.ziwei-compat-view-btn:focus-visible {
+  outline-offset: -3px;
+}
+
+.ziwei-compat-view {
+  min-width: 0;
+}
+
+/* ---------- View: 重點摘要 — ruled columns like 宜 / 忌 ---------- */
+.ziwei-compat-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ziwei-compat-bucket {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.ziwei-compat-bucket + .ziwei-compat-bucket {
+  border-top: 1px solid var(--red);
+}
+
+.ziwei-compat-bucket-vh {
+  align-items: flex-start;
+  padding: 12px 0;
+}
+
+.ziwei-compat-bucket-vh > span {
+  font-size: 14px;
+  letter-spacing: 0.22em;
+}
+
+.ziwei-compat-bucket.is-support .ziwei-compat-bucket-vh {
+  border-right-color: var(--red);
+  background: var(--red);
+}
+
+.ziwei-compat-bucket.is-coordinate .ziwei-compat-bucket-vh {
+  border-right-color: var(--ink);
+  background: var(--ink);
+}
+
+.ziwei-compat-bucket.is-support .ziwei-compat-bucket-vh > span {
+  color: var(--on-red);
+}
+
+.ziwei-compat-bucket.is-coordinate .ziwei-compat-bucket-vh > span {
+  color: var(--on-ink);
+}
+
+.ziwei-compat-empty {
+  align-self: start;
+  padding: 14px 16px;
+  color: var(--gray);
+  font: 500 14px/1.6 var(--serif);
+}
+
+.ziwei-compat-findings {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ziwei-compat-finding {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 14px 12px 16px;
+}
+
+.ziwei-compat-finding + .ziwei-compat-finding {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-compat-finding-title {
+  font: 700 18px/1.5 var(--serif);
+  letter-spacing: 0.01em;
+}
+
+.ziwei-compat-finding-text,
+.ziwei-compat-prompt {
+  max-width: 68ch;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.ziwei-compat-finding-text {
+  color: var(--ink-2);
+}
+
+.ziwei-compat-prompt b {
+  margin-inline-end: 8px;
+  color: var(--red);
+  font: 700 13px/1 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-compat-finding-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 4px;
+}
+
+.ziwei-compat-evidence {
+  flex: 1 1 12em;
+  min-width: 0;
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ziwei-compat-jump {
+  flex: none;
+}
+
+/* Printed direction / person tag */
+.ziwei-compat-dir {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font: 600 12px/1.6 var(--serif);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ziwei-compat-dir.is-mutual {
+  border-color: var(--hair-strong);
+  color: var(--ink-2);
+}
+
+/* ---------- View: 雙盤檢視 ---------- */
+.ziwei-compat-dual-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ziwei-compat-hint {
+  color: var(--gray);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ziwei-compat-mobile-toggle {
+  display: grid;
+  flex: 1 1 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.ziwei-compat-toggle-btn {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--red);
+  font: 600 14px/1.2 var(--sans);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+
+.ziwei-compat-toggle-btn + .ziwei-compat-toggle-btn {
+  border-left: 1px solid var(--red);
+}
+
+.ziwei-compat-toggle-btn:hover {
+  background: var(--red-wash);
+}
+
+.ziwei-compat-toggle-btn.is-active {
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.ziwei-compat-toggle-btn:focus-visible {
+  outline-offset: -4px;
+}
+
+.ziwei-compat-toggle-btn.is-active:focus-visible {
+  outline-color: var(--on-red);
+}
+
+.ziwei-compat-dual-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ziwei-compat-chart-pane {
+  display: none;
+  min-width: 0;
+  padding: 12px 12px 14px;
+}
+
+.ziwei-compat-chart-pane.is-mobile-active {
+  display: block;
+}
+
+.ziwei-compat-pane-title {
+  margin-bottom: 10px;
+  color: var(--red);
+  font: 700 15px/1.3 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+/* 4x4 palace grid: hairline vermilion rules from a 1px gap over the rule colour */
+.ziwei-compat-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--red);
+  background: var(--rule);
+}
+
+.ziwei-compat-cell,
+.ziwei-compat-mini-center {
+  background: var(--paper-hi);
+}
+
+.ziwei-compat-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 6px 6px 8px;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out);
+}
+
+.ziwei-compat-cell:hover {
+  background: color-mix(in srgb, var(--red) 7%, var(--paper-hi));
+}
+
+.ziwei-compat-cell:focus-visible {
+  z-index: 1;
+  outline-offset: -2px;
+}
+
+.ziwei-compat-cell.is-highlighted {
+  background: color-mix(in srgb, var(--red) 13%, var(--paper-hi));
+  box-shadow: inset 0 0 0 2px var(--red);
+}
+
+.ziwei-compat-cell-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 4px;
+}
+
+.ziwei-compat-palace-name {
+  color: var(--red);
+  font: 700 13px/1.3 var(--serif);
+  white-space: nowrap;
+}
+
+.ziwei-compat-branch {
+  color: var(--gray);
+  font: 500 11px/1.3 var(--serif);
+}
+
+.ziwei-compat-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 5px;
+}
+
+.ziwei-compat-star.is-main {
+  color: var(--ink);
+  font: 600 13px/1.45 var(--serif);
+}
+
+.ziwei-compat-star.is-minor {
+  color: var(--gray);
+  font: 400 11px/1.6 var(--sans);
+}
+
+.ziwei-compat-hua {
+  color: var(--red);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.ziwei-compat-hua.is-ji {
+  color: var(--ink);
+}
+
+.ziwei-compat-star.is-star-hit {
+  padding: 0 3px;
+  background: var(--red);
+  color: var(--on-red);
+}
+
+.ziwei-compat-star.is-star-hit .ziwei-compat-hua {
+  color: inherit;
+}
+
+.ziwei-compat-mini-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  text-align: center;
+}
+
+.ziwei-compat-center-title {
+  margin-bottom: 4px;
+  color: var(--red);
+  font: 700 17px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-compat-center-line {
+  color: var(--gray);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---------- Palace popover: a paper slip ---------- */
+.ziwei-compat-popover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: color-mix(in srgb, var(--ink) 42%, transparent);
+  animation: cf-fade var(--t-base) var(--ease-out) both;
+}
+
+[data-theme="dark"] .ziwei-compat-popover-backdrop {
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+
+.ziwei-compat-popover {
+  width: 100%;
+  max-height: 86dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 2px solid var(--red);
+  background: var(--paper-hi);
+  box-shadow: var(--shadow-pop);
+  color: var(--ink);
+  animation: cf-sheet-up var(--t-slow) var(--ease-out) both;
+}
+
+.ziwei-compat-popover:focus {
+  outline: 0;
+}
+
+.ziwei-compat-popover-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: 10px 10px 10px 16px;
+  border-bottom: 1px solid var(--red);
+  background: var(--paper-hi);
+}
+
+.ziwei-compat-popover-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.ziwei-compat-popover-title h3 {
+  color: var(--red);
+  font: 700 21px/1.3 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-compat-popover-title h3 small {
+  margin-inline-start: 6px;
+  color: var(--gray);
+  font: 600 14px/1 var(--serif);
+}
+
+.ziwei-compat-pop-close {
+  flex: none;
+  width: 40px;
+  padding: 0;
+}
+
+.ziwei-compat-popover-body {
+  margin: 0;
+}
+
+.ziwei-compat-pop-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ziwei-compat-pop-row + .ziwei-compat-pop-row {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-compat-pop-row dt {
+  padding: 10px 16px 0;
+  color: var(--red);
+  font: 600 13px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+}
+
+.ziwei-compat-pop-row dd {
+  min-width: 0;
+  margin: 0;
+  padding: 4px 16px 12px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.ziwei-compat-popover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ziwei-compat-popover-list b {
+  font-family: var(--serif);
+  font-weight: 700;
+}
+
+.ziwei-compat-note {
+  max-width: 72ch;
+  color: var(--gray);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ---------- View: 地支疊宮 and evidence tables ---------- */
+.ziwei-compat-table-wrap {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ziwei-compat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ziwei-compat-table :is(th, td) {
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ziwei-compat-table :is(th, td) + :is(th, td) {
+  border-left: 1px solid var(--rule);
+}
+
+.ziwei-compat-table thead th {
+  border-bottom: 1px solid var(--red);
+  color: var(--red);
+  font: 600 13px/1.4 var(--serif);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.ziwei-compat-table tbody tr + tr > * {
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-compat-table.is-overlay tbody th {
+  width: 3.4em;
+  color: var(--red);
+  font: 700 19px/1.35 var(--serif);
+  text-align: center;
+}
+
+.ziwei-compat-table.is-overlay td b {
+  font: 600 15px/1.45 var(--serif);
+}
+
+.ziwei-compat-table td small {
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.ziwei-compat-overlay-stars {
+  display: block;
+  color: var(--ink-2);
+  font: 500 13px/1.55 var(--serif);
+}
+
+/* ---------- View: 計算依據 ---------- */
+.ziwei-compat-ev-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 14px 18px;
+}
+
+.ziwei-compat-ev-sec + .ziwei-compat-ev-sec {
+  border-top: 1px solid var(--red);
+}
+
+.ziwei-compat-ev-title {
+  color: var(--red);
+  font: 700 15px/1.5 var(--serif);
+  letter-spacing: 0.03em;
+}
+
+.ziwei-compat-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s4);
+  margin-top: 4px;
+}
+
+.ziwei-compat-sihua-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  min-width: 0;
+}
+
+.ziwei-compat-sihua-block .ziwei-compat-table-wrap {
+  width: 100%;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.ziwei-compat-table.is-sihua {
+  font-size: 13px;
+}
+
+.ziwei-compat-table.is-sihua :is(th, td) {
+  padding: 7px 8px;
+  white-space: nowrap;
+}
+
+.ziwei-compat-hua-cell {
+  color: var(--red);
+  font-family: var(--serif);
+  font-weight: 700;
+}
+
+.ziwei-compat-hua-cell.is-ji {
+  color: var(--ink);
+}
+
+.ziwei-compat-status.is-uncovered,
+.ziwei-compat-status.is-ambiguous {
+  color: var(--ochre);
+}
+
+.ziwei-compat-norm {
+  min-width: 0;
+}
+
+.ziwei-compat-norm-title {
+  margin: 0 0 6px;
+  font: 700 14px/1.4 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-compat-facts {
+  margin: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.ziwei-compat-fact {
+  display: grid;
+  grid-template-columns: 8.5em minmax(0, 1fr);
+  border-bottom: 1px solid var(--rule);
+}
+
+.ziwei-compat-fact dt {
+  padding: 7px 10px 7px 0;
+  color: var(--red);
+  font: 600 12px/1.5 var(--serif);
+  letter-spacing: 0.04em;
+}
+
+.ziwei-compat-fact dd {
+  min-width: 0;
+  margin: 0;
+  padding: 7px 0 7px 10px;
+  border-left: 1px solid var(--rule);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ziwei-compat-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ziwei-compat-warnings li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 72ch;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.ziwei-compat-warnings code {
+  align-self: flex-start;
+  color: var(--ochre);
+  font: 600 11px/1.6 var(--mono);
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- The authored moment: a new result stamps down ----------
+   The 合盤 seal stamps; the findings print in with a capped stagger
+   (≤ 4 steps × 40ms + 240ms = 400ms). Only on a new result: the JS marks
+   the sheet .is-fresh once per response, never on a view switch. */
+@keyframes zc-finding-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ziwei-compat-seal.is-stamping {
+    animation: cf-stamp 620ms var(--ease-stamp) both;
+  }
+
+  .ziwei-compat-sheet.is-fresh .ziwei-compat-finding {
+    animation: zc-finding-in 240ms var(--ease-out) both;
+    animation-delay: calc(var(--zc-i, 0) * 40ms + 200ms);
+  }
+
+  /* Landed below the fold: wait for the scroll before printing */
+  .ziwei-compat-sheet.is-lead-in .ziwei-compat-seal.is-stamping {
+    animation-delay: 320ms;
+  }
+
+  .ziwei-compat-sheet.is-lead-in.is-fresh .ziwei-compat-finding {
+    animation-delay: calc(var(--zc-i, 0) * 40ms + 520ms);
+  }
+}
+
+/* ---------- Touch ---------- */
+@media (pointer: coarse) {
+  .ziwei-compat-check {
+    min-height: var(--tap);
+  }
+
+  .ziwei-compat-toggle-btn,
+  .ziwei-compat-jump,
+  .ziwei-compat-pop-close {
+    min-height: var(--tap);
+  }
+
+  .ziwei-compat-pop-close {
+    width: var(--tap);
+  }
+}
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 600px) {
+  .ziwei-compat-popover-backdrop {
+    align-items: center;
+    padding: var(--s5);
+  }
+
+  .ziwei-compat-popover {
+    width: min(580px, 100%);
+    max-height: min(84vh, 720px);
+    padding-bottom: 0;
+    border: 1px solid var(--red);
+    border-radius: var(--radius);
+    animation: cf-sheet-in var(--t-slow) var(--ease-sheet) both;
+  }
+
+  .ziwei-compat-pop-row {
+    grid-template-columns: 7.5em minmax(0, 1fr);
+  }
+
+  .ziwei-compat-pop-row dt {
+    padding: 12px 10px 12px 16px;
+    border-right: 1px solid var(--rule);
+  }
+
+  .ziwei-compat-pop-row dd {
+    padding: 12px 16px;
+  }
+}
+
+@media (min-width: 760px) {
+  .ziwei-compat-row {
+    grid-template-columns: 7.5em minmax(0, 1fr);
+  }
+
+  .ziwei-compat-submit-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s5);
+  }
+
+  .ziwei-compat-submit {
+    flex: none;
+    order: 2;
+    width: auto;
+  }
+
+  .ziwei-compat-policy {
+    order: 1;
+  }
+
+  .ziwei-compat-head {
+    grid-template-columns: minmax(0, 1fr) 200px minmax(0, 1fr);
+  }
+
+  .ziwei-compat-party {
+    padding: 20px 32px 22px;
+  }
+
+  .ziwei-compat-party.is-a {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .ziwei-compat-party.is-b {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .ziwei-compat-party-name {
+    font-size: 18px;
+  }
+
+  .ziwei-compat-party-meta {
+    font-size: 13px;
+  }
+
+  .ziwei-compat-views {
+    display: flex;
+  }
+
+  .ziwei-compat-view-btn {
+    padding: 8px 24px;
+  }
+
+  .ziwei-compat-view-btn:last-child {
+    border-right: 1px solid var(--rule);
+  }
+
+  .ziwei-compat-ev-sec {
+    padding: 20px 20px 22px;
+  }
+}
+
+@media (min-width: 960px) {
+  .ziwei-compat-pair-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s5);
+  }
+
+  .ziwei-compat-row {
+    grid-template-columns: 10em minmax(0, 1fr);
+  }
+
+  .ziwei-compat-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ziwei-compat-bucket + .ziwei-compat-bucket {
+    border-top: 0;
+    border-left: 1px solid var(--red);
+  }
+
+  .ziwei-compat-mobile-toggle {
+    display: none;
+  }
+
+  .ziwei-compat-dual-wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ziwei-compat-chart-pane {
+    display: block;
+    padding: 16px 18px 18px;
+  }
+
+  .ziwei-compat-chart-pane + .ziwei-compat-chart-pane {
+    border-left: 1px solid var(--red);
+  }
+
+  .ziwei-compat-cell {
+    min-height: 104px;
+    padding: 8px 8px 10px;
+  }
+
+  .ziwei-compat-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s5);
+  }
+}
+
+/* Reduced motion: the new result fades in place; the slip fades instead of sliding. */
+@media (prefers-reduced-motion: reduce) {
+  .ziwei-compat-seal.is-stamping,
+  .ziwei-compat-sheet.is-fresh .ziwei-compat-finding,
+  .ziwei-compat-popover {
+    animation: cf-fade 160ms var(--ease-out) both;
+  }
+}

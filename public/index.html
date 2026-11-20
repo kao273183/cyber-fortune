@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>吉時行樂 · Lucky Hour</title>
+  <meta name="description" content="老黃曆、十二星座、紫微斗數、西洋星盤、媽祖靈籤、塔羅占卜，一站搞定，免下載免註冊。" />
+  <meta name="theme-color" content="#f4eedf" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#16120e" media="(prefers-color-scheme: dark)" />
+  <script>
+    (function () {
+      try {
+        var forced = (location.search.match(/[?&]theme=(light|dark)\b/) || [])[1];
+        var saved = forced || localStorage.getItem('cyber_fortune_theme');
+        var theme = saved === 'light' || saved === 'dark'
+          ? saved
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;600;700;900&family=Noto+Sans+Symbols:wght@400;600&display=swap" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/fortune.css" />
+  <link rel="stylesheet" href="css/tab-zodiac.css" />
+  <link rel="stylesheet" href="css/tab-ziwei.css" />
+  <link rel="stylesheet" href="css/tab-ziwei-compat.css" />
+  <link rel="stylesheet" href="css/tab-astro.css" />
+  <link rel="stylesheet" href="css/tab-oracle.css" />
+  <link rel="stylesheet" href="css/tab-tarot.css" />
+</head>
+<body class="cf-body">
+  <div class="cf-page-shell">
+    <header class="cf-topbar">
+      <div class="cf-brand">
+        <span class="cf-brand-seal" aria-hidden="true">吉</span>
+        <strong id="cf-app-title" class="cf-brand-name">吉時行樂</strong>
+      </div>
+      <div class="cf-topbar-actions">
+        <button id="cf-lang-btn" class="btn btn-sm btn-ghost cf-lang-btn" type="button" aria-label="Switch to English">
+          <span class="is-on">中</span><span class="cf-lang-sep">/</span><span>EN</span>
+        </button>
+        <button id="cf-theme-btn" class="btn btn-sm btn-ghost cf-icon-btn" type="button" aria-label="切換深淺色">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.75" stroke="currentColor" stroke-width="1.5" />
+            <path d="M9 2.25a6.75 6.75 0 0 1 0 13.5z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="fortune-page-root" class="cf-page-main"></main>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/fortune-ziwei-compatibility.js"></script>
+  <script src="js/components/fortune-oracle.js"></script>
+  <script src="js/components/fortune-tarot.js"></script>
+  <script src="js/views-fortune.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

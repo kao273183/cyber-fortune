@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "public/index.html"
+        ],
+        "createdAt": "2026-11-20T01:45:20.093Z",
+        "reason": "user confirmed: owner picked the 紅黑雙色農民曆 direction on the decision page; its almanac paper ground #F4EEDF is the chosen world (.impeccable/surfaces/public-index-html.md)"
+      }
+    ]
+  }
+}

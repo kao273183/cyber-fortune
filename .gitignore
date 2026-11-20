@@ -1,0 +1,14 @@
+node_modules/
+data/*.db
+data/*.db-wal
+data/*.db-shm
+.DS_Store
+*.log
+dist/
+
+# Impeccable working files: review screenshots (100MB+) and the hook cache
+.impeccable/review/
+.impeccable/hook.cache.json
+
+# Machine-local Claude Code settings
+.claude/settings.local.json
